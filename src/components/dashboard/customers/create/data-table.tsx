@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import {
+    flexRender,
     useTable,
     type ColumnDef,
     type SortingState,
@@ -53,6 +54,13 @@ export function DataTable<TData extends RowData>({
         features,
         data,
         columns,
+        defaultColumn: {
+            size: 150,
+            minSize: 100,
+            maxSize: 320,
+        },
+        enableColumnResizing: true,
+        columnResizeMode: "onChange",
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         onGlobalFilterChange: setGlobalFilter,
@@ -139,14 +147,35 @@ export function DataTable<TData extends RowData>({
 
             {/* Table Container */}
             <div className="overflow-hidden lg:rounded-md border lg:m-2 px-1">
-                <Table>
+                {/* table-fixed enforces strict cell width behavior */}
+                <Table className="table-fixed w-full">
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
+                                    <TableHead
+                                        key={header.id}
+                                        style={{
+                                            width: `${header.getSize()}px`,
+                                            minWidth: `${header.getSize()}px`,
+                                        }}
+                                        className="relative group truncate select-none"
+                                    >
                                         {header.isPlaceholder ? null : (
-                                            <table.FlexRender header={header} />
+                                            flexRender(
+                                                header.column.columnDef.header,
+                                                header.getContext()
+                                            )
+                                        )}
+
+                                        {/* Render the Resizer Drag Handle */}
+                                        {header.column.getCanResize() && (
+                                            <div
+                                                onMouseDown={header.getResizeHandler()}
+                                                onTouchStart={header.getResizeHandler()}
+                                                className={`absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none bg-ink-dark opacity-0 group-hover:opacity-100 ${header.column.getIsResizing() ? "opacity-100" : ""
+                                                    }`}
+                                            />
                                         )}
                                     </TableHead>
                                 ))}
@@ -162,15 +191,23 @@ export function DataTable<TData extends RowData>({
                                     className="hover:bg-ink/5 dark:hover:bg-ink/10 transition-colors"
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            <table.FlexRender cell={cell} />
+                                        <TableCell
+                                            key={cell.id}
+                                            style={{
+                                                width: `${cell.column.getSize()}px`,
+                                                minWidth: `${cell.column.columnDef.minSize ?? 50}px`,
+                                                maxWidth: `${cell.column.columnDef.maxSize ?? 500}px`,
+                                            }}
+                                            className="truncate"
+                                        >
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center text-ink/60">
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
                                     No Customers found. Refresh or create a new Customer.
                                 </TableCell>
                             </TableRow>

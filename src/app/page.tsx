@@ -5,8 +5,21 @@ import { Testimonials } from "@/components/homePage/Testimonial";
 import { Features } from "@/components/homePage/Features";
 import { HowItWorks } from "@/components/homePage/HowItWorks";
 
+async function getProjects() {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
+  const res = await fetch(new URL('/hello', baseUrl), { cache: 'no-store' });
+
+  if (!res.ok) throw new Error("Failed to fetch projects");
+
+  const json = await res.json();
+  console.log(json);
+  return json?.message ?? json;
+}
+
 export default async function Home() {
   const supabase = await createClient();
+  const message = await getProjects();
+  console.log(message);
   const {
     data: { user },
   } = await supabase.auth.getUser();

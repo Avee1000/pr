@@ -101,8 +101,8 @@ export default function NotificationIcon() {
         role="dialog"
         aria-label="Notifications Panel"
         aria-hidden={!isOpen}
-        className={`fixed top-16 right-0 bottom-0 z-50 w-80 sm:w-96 m-1 rounded-2xl bg-white dark:bg-ink border-l border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-16 right-0 bottom-0 z-50 w-80 sm:w-96 m-1 ml-0 rounded-2xl bg-white dark:bg-ink border-l border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
+          isOpen ? 'translate-x-0' : 'translate-x-[101%]'
         }`}
       >
         {/* Panel Header */}

@@ -79,7 +79,7 @@ export default function ViewOrders({ ordersPromise, onDelete, }: {
     }, [searchParams])
 
     return (
-        <main className="w-auto max-w-5xl mx-auto box-border">
+        <main className="">
             {/* Top Control Bar: Search & Refresh — renders immediately, never suspends */}
             <div className="flex flex-col sm:flex-row gap-3 justify-between items-center rounded-lg mb-6 shadow-md/20 p-4 w-full box-border dark:bg-muted">
                 <div id="searchBoxContainer" className="w-full sm:flex-1 sm:max-w-[50%]">

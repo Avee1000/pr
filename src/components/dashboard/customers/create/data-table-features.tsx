@@ -2,6 +2,8 @@ import {
   columnFilteringFeature,
   columnVisibilityFeature,
   createFilteredRowModel,
+  columnSizingFeature,
+  columnResizingFeature,
   createPaginatedRowModel,
   createSortedRowModel,
   filterFn_includesString,
@@ -17,7 +19,9 @@ import {
 export const features = tableFeatures({
   columnFilteringFeature,
   globalFilteringFeature,
+  columnSizingFeature, 
   columnVisibilityFeature,
+  columnResizingFeature,
   rowPaginationFeature,
   rowSelectionFeature,
   rowSortingFeature,

@@ -25,9 +25,9 @@ export const columns = columnHelper.columns([
     ),
     cell: ({ row }) => (
       <div className='py-1'>
-        <div className="text-ink dark:text-white font-semibold">{row.original.name}</div>
+        <div className="text-ink dark:text-white font-semibold truncate text-ellipsis">{row.original.name}</div>
         {row.original.email && (
-          <div className="text-muted-foreground text-[10px]">{row.original.email}</div>
+          <div className="text-muted-foreground text-[10px]  truncate text-ellipsis">{row.original.email}</div>
         )}
       </div>
     ),
@@ -80,7 +80,7 @@ export const columns = columnHelper.columns([
     ),
   }),
   columnHelper.display({
-    header: () => <div className="text-left px-2">Actions</div>,
+    header: () => <div className="text-right px-2">Actions</div>,
     id: "actions",
     cell: ({ row }) => (
       <div className="text-right space-x-1.5 whitespace-nowrap px-2">
