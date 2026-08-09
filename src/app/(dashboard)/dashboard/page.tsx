@@ -18,7 +18,7 @@ export default async function OrdersDashboard() {
 
   return (
     <div
-      className="dark:bg-ink min-h-screen text-ink dark:white  flex-1 w-auto m-1 rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.2)] bg-white"
+      className="dark:bg-ink min-h-screen text-ink dark:white  flex-1 w-auto m-1 rounded-md shadow-[0_0_15px_rgba(0,0,0,0.2)] bg-white"
     >
 
       <main className="p-8 max-w-7xl mx-auto">

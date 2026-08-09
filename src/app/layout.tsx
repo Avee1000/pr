@@ -6,6 +6,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { Loader } from "lucide-react";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import TopLoader from "@/components/TopLoader";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -29,6 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn(
         "h-full",
         "antialiased",
@@ -38,19 +41,27 @@ export default function RootLayout({
       )}
     >
       <body className="flex min-h-screen flex-col bg-background max-w-full text-foreground overflow-x-hidden">
-        <Header />
-        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-ink dark:scrollbar-thumb-white">          
-          <main className="flex-1">{children}</main>
-          <Toaster
-            icons={{
-              loading: <Loader className="size-5 animate-spin" />,
-            }}
-            richColors
-            duration={4000}
-            position="top-center"
-          />
-          <Footer />
-        </div>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TopLoader />
+          <Header />
+          <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-ink dark:scrollbar-thumb-white">
+            <main className="flex-1">{children}</main>
+            <Toaster
+              icons={{
+                loading: <Loader className="size-5 animate-spin" />,
+              }}
+              richColors
+              duration={4000}
+              position="top-center"
+            />
+            <Footer />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

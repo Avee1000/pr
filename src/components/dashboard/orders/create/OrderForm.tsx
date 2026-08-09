@@ -221,7 +221,7 @@ export default function OrderForm({ customers, materials, laborCost, targetProfi
   // };
 
   return (
-    <form action={formAction} className="space-y-6 max-w-5xl mx-auto">
+    <form action={formAction} className="space-y-6 max-w-7xl mx-auto">
       {/* {errorMessage && (
         <div className="flex items-center gap-3 rounded-xl border border-red-600/25 bg-red-50 px-4 py-3.5 text-sm text-red-600 shadow-sm animate-in fade-in-50">
           <AlertCircle className="h-5 w-5 shrink-0" />

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import useSWR from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
 import { Bell, X, AlertCircle, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 import { playSuccessChime } from '@/utils/playBeep'
@@ -21,26 +21,43 @@ const fetcher = async (url: string): Promise<Notification[]> => {
 }
 
 export default function NotificationIcon() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [notificationsList, setNotificationsList] = useState<Notification[]>([]);
   const prevCountRef = useRef<number | null>(null)
+  const { mutate } = useSWRConfig()
 
   const { data: notifications = [], error } = useSWR<Notification[]>(
     '/api/notifications',
-    fetcher,
-    {
-      refreshInterval: 3000, 
-      revalidateOnFocus: true,
-      dedupingInterval: 2000,
-    }
+    fetcher
   )
 
-  // 1. Sound Trigger: Only play chime when NEW notifications arrive
+  // 1. Establish SSE Connection for Real-Time SWR Updates (Runs once on mount)
   useEffect(() => {
-    if (prevCountRef.current !== null && notifications.length > prevCountRef.current) {
-      playSuccessChime()
+    const eventSource = new EventSource('/api/notifications/sse')
+
+    // When server sends a message, revalidate SWR cache
+    eventSource.onmessage = (event: MessageEvent) => {
+      console.log('SSE Received event:', event.data)
+      mutate('/api/notifications')
     }
-    prevCountRef.current = notifications.length
-  }, [notifications.length])
+
+    eventSource.onerror = (err) => {
+      console.error('SSE Connection Error:', err)
+    }
+
+    // Clean up connection when component unmounts
+    return () => {
+      eventSource.close()
+    }
+  }, [mutate])
+
+  // // 2. Sound Trigger: Play chime whenever notification count increases
+  // useEffect(() => {
+  //   if (prevCountRef.current !== null && notifications.length > prevCountRef.current) {
+  //     playSuccessChime()
+  //   }
+  //   prevCountRef.current = notifications.length
+  // }, [notifications.length])
 
   // 2. Lock Body Scroll on Drawer Open
   useEffect(() => {
@@ -101,9 +118,8 @@ export default function NotificationIcon() {
         role="dialog"
         aria-label="Notifications Panel"
         aria-hidden={!isOpen}
-        className={`fixed top-19 right-0 bottom-0 z-50 w-80 sm:w-96 m-1 ml-0 rounded-2xl bg-white dark:bg-ink border-l border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? 'translate-x-0' : 'translate-x-[101%]'
-        }`}
+        className={`fixed top-19 right-0 bottom-0 z-50 w-80 sm:w-96 m-1 ml-0 rounded-2xl bg-white dark:bg-ink border-l border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-[101%]'
+          }`}
       >
         {/* Panel Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">

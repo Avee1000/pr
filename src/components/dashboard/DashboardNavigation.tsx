@@ -66,7 +66,7 @@ export default function OrderNavLinks() {
         >
             <section
                 style={{ backgroundColor: "#1A1A1A" }}
-                className="flex flex-col h-full rounded-2xl text-white shadow-md overflow-hidden"
+                className="flex flex-col h-full rounded-md text-white shadow-md overflow-hidden"
             >
                 {/* Toggle Button */}
                 <div className={`flex items-center justify-end h-14 px-2.5 border-b border-muted-foreground/50`}>

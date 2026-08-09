@@ -70,7 +70,7 @@ export async function GET(
     // HEADER ROW
     // -----------------------------------------------------------------
     const headerY = currentY;
-    const logoPath = path.join(process.cwd(), 'public', 'logo.png');
+    const logoPath = path.join(process.cwd(), 'public', 'android-chrome-512x512.png');
 
     if (fs.existsSync(logoPath)) {
       doc.image(logoPath, startX, headerY, { fit: [140, 42] });
