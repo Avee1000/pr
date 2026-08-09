@@ -22,6 +22,7 @@ export default async function QuotePage({ params }: QuotePageProps) {
   }
 
   const quote: QuoteData = {
+    quoteId: row.order_id,
     quoteStatus: row.quote_status,
     approvedAt: row.approved_at,
     description: row.order_description,

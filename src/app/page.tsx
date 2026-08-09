@@ -18,8 +18,7 @@ async function getProjects() {
 
 export default async function Home() {
   const supabase = await createClient();
-  const message = await getProjects();
-  console.log(message);
+
   const {
     data: { user },
   } = await supabase.auth.getUser();

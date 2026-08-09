@@ -1,6 +1,7 @@
 import OrdersPage from "@/components/dashboard/orders/edit/ViewPage";
 import Link from "next/link";
 import { GripVertical } from "lucide-react";
+import Information from "@/components/Information";
 
 export default function OrderPage() {
   return (
@@ -18,7 +19,7 @@ export default function OrderPage() {
               <span className="text-foreground font-medium">Orders</span>
             </div>
             <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground">
-              View & Adjust orders
+              View & Adjust orders <Information detail={"While owners can edit price and payment status, customers will always have the most absolute control over their orders with the most accurate pricing and status information irrespective of future edits made by you or your organization."}/>
             </h1>
             <p className="text-muted-foreground">
               Review active client orders, monitor <span>PriceRight</span> automated pricing

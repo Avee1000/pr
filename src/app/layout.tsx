@@ -39,16 +39,18 @@ export default function RootLayout({
     >
       <body className="flex min-h-screen flex-col bg-background max-w-full text-foreground overflow-x-hidden">
         <Header />
-        <main className="flex-1 pt-20">{children}</main>
-        <Toaster
-          icons={{
-            loading: <Loader className="size-5 animate-spin" />,
-          }}
-          richColors
-          duration={4000}
-          position="top-center"
-        />
-        <Footer />
+        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-ink dark:scrollbar-thumb-white">          
+          <main className="flex-1">{children}</main>
+          <Toaster
+            icons={{
+              loading: <Loader className="size-5 animate-spin" />,
+            }}
+            richColors
+            duration={4000}
+            position="top-center"
+          />
+          <Footer />
+        </div>
       </body>
     </html>
   );

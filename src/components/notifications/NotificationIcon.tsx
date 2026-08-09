@@ -90,7 +90,7 @@ export default function NotificationIcon() {
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 top-16 bg-black/20 dark:bg-black/40 z-40 backdrop-blur-xs transition-opacity"
+          className="fixed inset-0 top-19 bg-black/20 dark:bg-black/40 z-40 backdrop-blur-xs transition-opacity"
           aria-hidden="true"
         />
       )}
@@ -101,7 +101,7 @@ export default function NotificationIcon() {
         role="dialog"
         aria-label="Notifications Panel"
         aria-hidden={!isOpen}
-        className={`fixed top-16 right-0 bottom-0 z-50 w-80 sm:w-96 m-1 ml-0 rounded-2xl bg-white dark:bg-ink border-l border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
+        className={`fixed top-19 right-0 bottom-0 z-50 w-80 sm:w-96 m-1 ml-0 rounded-2xl bg-white dark:bg-ink border-l border-border shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
           isOpen ? 'translate-x-0' : 'translate-x-[101%]'
         }`}
       >

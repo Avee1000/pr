@@ -14,7 +14,7 @@ export default async function Header() {
   } = await supabase.auth.getUser();
 
   return (
-    <header className="fixed w-full z-20 border-b border-border bg-white dark:bg-ink dark:text-white">
+    <header className="shrink-0 h-19 w-full z-20 border-b border-border bg-white dark:bg-ink dark:text-white">
       <div className="mx-auto flex items-center justify-between px-4 py-4">
         <div className="max-sm:block hidden">
           <IsMobileOrderNavLinks />
