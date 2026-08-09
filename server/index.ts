@@ -1,18 +1,20 @@
 import "dotenv/config";
 import express from 'express';
+import path from 'path';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import receiptRoutes from "./src/routes/pdf-route";
 import { requireSupabaseAuth } from "./src/middleware/auth";
-
+import { generateReceipt } from "./src/controllers/pdf-controller";
 const app = express();
+app.use(express.static(path.join(__dirname, 'public')));
 const PORT = process.env.PORT || 5000;
 
 // 1. Enable CORS with credentials (allows cookies across ports)
-app.use(cors({ 
+app.use(cors({
   origin: "http://localhost:3000",
-  credentials: true 
-})); 
+  credentials: true
+}));
 
 app.use(express.json());
 app.use(cookieParser()); // Enables req.cookies
@@ -47,10 +49,13 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', server: 'Express running on port ' + PORT });
 });
 
+// app.get('/preview-pdf/:quoteId', generateReceipt
+// );
+
 // 3. Protected Routes Gatekeeper
 app.use("/api", requireSupabaseAuth);
 
-app.use('/api', receiptRoutes);
+app.use('/api/downloads', receiptRoutes);
 
 app.get("/api/protected", (req, res) => {
   res.json({
@@ -61,4 +66,4 @@ app.get("/api/protected", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Express server running on http://localhost:${PORT}`);
-});
+}); 

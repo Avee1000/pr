@@ -20,7 +20,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
     console.log("Supabase environment variables loaded successfully"); 
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
         autoRefreshToken: false,
         persistSession: false,
@@ -63,7 +63,6 @@ export const requireSupabaseAuth = async (
   // 1. Check HttpOnly Cookie (for browser address bar & fetch)
   if (req.cookies && req.cookies.sb_access_token) {
     token = req.cookies.sb_access_token;
-    console.log(token)
   } 
   // 2. Fallback to Authorization Header (for Postman, Thunder Client, Mobile Apps)
   else if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
@@ -71,8 +70,6 @@ export const requireSupabaseAuth = async (
   }
 
   console.log("Cookies received by Express:", req.cookies);
-  console.log("Authorization header received by Express:", req.headers.authorization);
-
 
   if (!token) {
     return res.status(401).json({ error: "Unauthorized: No token provided" });

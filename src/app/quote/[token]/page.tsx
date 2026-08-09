@@ -12,7 +12,6 @@ export default async function QuotePage({ params }: QuotePageProps) {
 
   const { data, error } = await supabase.rpc("get_quote_by_token", { p_token: token });
   const row = Array.isArray(data) ? data[0] : null;
-
   if (error || !row) {
     return (
       <div className="max-w-2xl mx-auto p-10 text-center">

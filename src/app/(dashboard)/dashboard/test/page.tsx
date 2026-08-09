@@ -25,10 +25,11 @@ export default async function DashboardPage() {
   const data = await res.json();
 
   return (
-    <div>
+    <div className="block w-full h-screen">
       <h1>Express Data:</h1>
       <p className="wrap-break-word">Bearer {session.access_token}</p>
       <pre>{JSON.stringify(data, null, 2)}</pre>
+      {/* <iframe className="w-full h-full" src="http://localhost:5000/preview-pdf/8a1f6584-6cd7-47f0-9bdc-a2e8e09d6e6d"></iframe> */}
     </div>
   );
 }

@@ -29,7 +29,8 @@ export function QuoteView({ quote, children }: QuoteViewProps) {
           <div className="flex flex-row w-full justify-between">
             <p className="text-sm text-ink/60 dark:text-muted-foreground/60">Quote for</p>
             <span title="Download Quote" className="cursor-pointer">
-              <Link href={`/download/${quote.quoteId}`}>
+              <Link href={`/api/downloads/download-receipt/${quote.quoteId}`}
+                target="_blank" rel="noopener noreferrer">
                 <Download className="size-5" />
               </Link>
             </span>

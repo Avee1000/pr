@@ -1,13 +1,11 @@
-//server/src/routes/pdf-route.ts
 import { Router } from 'express';
+import { generateAll } from '../controllers/pdf-controller';
 import { generateReceipt } from '../controllers/pdf-controller';
-import { requireSupabaseAuth } from '../middleware/auth';
 
 const router = Router();
 
-// Protect ALL routes defined in this router
-router.use(requireSupabaseAuth);
+// Endpoint protected via Express app.use('/api', requireSupabaseAuth)
+router.get('/download-receipt/:quoteId', generateReceipt);
 
-router.get('/download-receipt', generateReceipt)
-
+router.get('/all', generateAll);
 export default router;
