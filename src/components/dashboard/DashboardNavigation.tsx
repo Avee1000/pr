@@ -84,7 +84,7 @@ export default function OrderNavLinks() {
                     <ul className="flex flex-col gap-1.5">
                         {navItems.map((item) => {
                             if (!isGroup(item)) {
-                                const isActive = pathname === item.href || (item.href === "/dashboard/customers" && pathname.startsWith("/dashboard/customers/edit/"));
+                                const isActive = pathname === item.href || (item.href === "/dashboard/customers" && pathname.startsWith("/dashboard/customers/edit/") || (item.href === "/dashboard/orders" && pathname.startsWith("/dashboard/orders/board")));
                                 const IconComponent = item.icon;
                                 return (
                                     <li key={item.href} className="w-full">

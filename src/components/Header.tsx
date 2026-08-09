@@ -20,7 +20,7 @@ export default async function Header() {
         <div className="max-sm:block hidden">
           <IsMobileOrderNavLinks />
         </div>
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-ink dark:text-white">
+        <Link href="/" className="flex items-center gap-1 text-lg font-semibold text-ink dark:text-white">
           <Image
             src="/android-chrome-512x512.png"
             width={32}
@@ -29,8 +29,7 @@ export default async function Header() {
             priority
             alt="PriceRight Logo"
           />
-          {/* <span className="rounded-lg bg-brand px-1.5 py-0.5 text-black shadow-sm">Price</span>
-          Right */}
+          PriceRight
         </Link>
         <div className="flex flex-row justify-center items-center gap-3">
           {!user && <ThemeToggleIcon />}

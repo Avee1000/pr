@@ -6,7 +6,7 @@ export default async function CashFlowSummary() {
 
   if (!summary.hasAnyOrders) {
     return (
-      <Card className="sm:max-w-250 mx-auto mb-6">
+      <Card className="sm:max-w-7xl mx-auto mb-6">
         <CardContent className="text-sm text-muted-foreground">
           No orders yet. Cash flow summaries will show up here once you create your first order.
         </CardContent>
@@ -15,7 +15,7 @@ export default async function CashFlowSummary() {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:max-w-250 mx-auto mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:max-w-7xl mx-auto mb-6">
       <Card>
         <CardHeader>
           <CardTitle>Revenue this month</CardTitle>

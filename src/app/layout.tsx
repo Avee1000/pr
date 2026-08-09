@@ -47,8 +47,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <TopLoader />
           <Header />
+          <div className="relative">
+            <TopLoader />
+          </div>
           <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-ink dark:scrollbar-thumb-white">
             <main className="flex-1">{children}</main>
             <Toaster
