@@ -46,8 +46,7 @@ export default function OrderRows({
     const [customerId, setCustomerId] = useState("");
     const [allCustomers, setAllCustomers] = useState<Customer[] | null>(null);
     const initialState: OrderState = { message: null, errors: {} };
-    const [isApproved, setIsApproved] = useState(false);
-    const [isDelivered, setIsDelivered] = useState(false);
+    
     const [editForm, setEditForm] = useState({
         customerName: '',
         description: '',

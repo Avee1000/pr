@@ -1,0 +1,8 @@
+{
+  "watch": ["src", ".env"],
+  "ext": "ts,js,json,env",
+  "exec": "tsx index.ts",
+  "events": {
+    "restart": "node -e \"require('fs').utimesSync('../src/app/layout.tsx', new Date(), new Date())\""
+  }
+}

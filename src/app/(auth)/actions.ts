@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { cookies } from 'next/headers';
 
 export interface AuthFormState {
   error?: string;
@@ -42,6 +43,7 @@ export async function signIn(
   _prevState: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  const cookieStore = await cookies();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
@@ -50,11 +52,20 @@ export async function signIn(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     return { error: "Invalid email or password. Please try again." };
   }
+
+  cookieStore.set('sb_access_token', data.session.access_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    domain: 'localhost',
+    path: '/',
+    maxAge: 3600, // 1 hour
+  });
 
   revalidatePath("/", "layout");
   redirect("/dashboard");
