@@ -33,6 +33,7 @@ AS $$
   LIMIT 1;
 $$;
 
+
 CREATE OR REPLACE FUNCTION approve_quote_by_token(p_token text)
 RETURNS TABLE (
   quote_status text,
@@ -66,6 +67,52 @@ END;
 $$;
 
 REVOKE ALL ON FUNCTION get_quote_by_token(text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION get_quote_by_id(uuid) FROM PUBLIC;
 REVOKE ALL ON FUNCTION approve_quote_by_token(text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION get_quote_by_token(text) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_quote_by_id(uuid) TO anon,authenticated;
 GRANT EXECUTE ON FUNCTION approve_quote_by_token(text) TO anon, authenticated;
+
+
+//////////////////////////////////////////////////////
+CREATE OR REPLACE FUNCTION get_quote_by_id(p_quote_id uuid)
+RETURNS TABLE (
+    quote_status text,
+    approved_at timestamptz,
+    order_description text,
+    quote_id uuid,
+    order_price numeric,
+    order_due_date date,
+    order_status text,
+    customer_name text
+) 
+LANGUAGE plpgsql
+-- 1. Bypasses RLS by running as the function owner/creator
+SECURITY DEFINER
+-- 2. Prevents search_path hijacking security risks
+SET search_path = public
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+    q.status::text AS quote_status,
+    q.approved_at,
+    o.description AS order_description,
+    q.id AS quote_id,
+    o.price AS order_price,
+    o.due_date AS order_due_date,
+    o.status::text AS order_status,
+    c.name AS customer_name
+  FROM quotes q
+  JOIN orders o ON o.id = q.order_id
+  JOIN customers c ON c.id = o.customer_id
+  WHERE q.id = p_quote_id
+  LIMIT 1;
+END;
+$$;
+
+
+GRANT EXECUTE ON FUNCTION get_quote_by_id(text) TO authenticated;
+GRANT EXECUTE ON FUNCTION get_quote_by_id(text) TO service_role;
+
+DROP FUNCTION IF EXISTS public.get_quote_by_id(uuid);
