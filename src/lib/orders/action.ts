@@ -285,72 +285,7 @@ export async function createOrder(prevState: OrderState, formData: FormData): Pr
 //     }
 // }
 
-export async function generateQuoteLink(
-  orderId: string,
-): Promise<{ token: string } | { error: string }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) {
-    return { error: "Unauthorized: you must be logged in." };
-  }
-
-  const { data: order, error: orderError } = await supabase
-    .from("orders")
-    .select("id")
-    .eq("id", orderId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (orderError || !order) {
-    return { error: "Order not found." };
-  }
-
-  const { data: existingQuote, error: existingError } = await supabase
-    .from("quotes")
-    .select("share_token")
-    .eq("order_id", orderId)
-    .maybeSingle();
-
-  if (existingError) {
-    console.error("Supabase select error (quotes):", existingError.message);
-    return { error: "Failed to generate quote link." };
-  }
-
-  if (existingQuote) {
-    return { token: existingQuote.share_token };
-  }
-
-  const token = crypto.randomUUID();
-
-  const { data: inserted, error: insertError } = await supabase
-    .from("quotes")
-    .insert({ order_id: orderId, share_token: token, status: "pending" })
-    .select("share_token")
-    .single();
-
-  if (insertError) {
-    // Unique conflict: another request created the quote first ? return that token.
-    if (insertError.code === "23505") {
-      const { data: racedQuote } = await supabase
-        .from("quotes")
-        .select("share_token")
-        .eq("order_id", orderId)
-        .maybeSingle();
-
-      if (racedQuote?.share_token) {
-        return { token: racedQuote.share_token };
-      }
-    }
-
-    console.error("Supabase insert error (quotes):", insertError.message);
-    return { error: "Failed to generate quote link." };
-  }
-
-  return { token: inserted.share_token };
-}
 
 export async function selectAllOrders() {
     const supabase = await createClient();

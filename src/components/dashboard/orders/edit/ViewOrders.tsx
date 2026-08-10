@@ -3,12 +3,13 @@
 import { useState, useEffect, Suspense, use } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Filter from '@/components/Filter';
-import { Edit2, Trash2, Loader, RefreshCw, Columns } from 'lucide-react';
+import { Loader, RefreshCw, Columns } from 'lucide-react';
 import { OrderRowsProps } from '@/lib/supabase/types';
 import { toast } from 'sonner'
 import Loading from '@/components/AnimateSpin';
 import OrderRows from './OrderRows';
 import useMediaQuery from '@/components/useMediaQuery';
+import ViewSingleOrder from './ViewSingleOrder';
 
 export const FilterList = [
     {
@@ -107,7 +108,7 @@ export default function ViewOrders({ ordersPromise, onDelete, }: {
             {/* Filter Component Section */}
             <div className="bg-muted shadow-md/20 rounded-lg w-full mb-6 p-2 box-border">
                 <Filter filters={FilterList} />
-            </div>            
+            </div>
 
             <Suspense fallback={<Loading />}>
                 <OrdersTable ordersPromise={ordersPromise} searchQuery={searchQuery} onDelete={() => onDelete} statusFilterValue={statusFilterValue} paymentFilterValue={paymentFilterValue} />
@@ -124,6 +125,7 @@ function OrdersTable({ ordersPromise, searchQuery, statusFilterValue, paymentFil
     onDelete?: (orderId: string) => void;
 }) {
     const orders = use(ordersPromise);
+    const [selectedOrder, setSelectedOrder] = useState<OrderRowsProps | null>(null);
     const [visibleColumns, setVisibleColumns] = useState({
         customer: true,
         description: true,
@@ -195,10 +197,23 @@ function OrdersTable({ ordersPromise, searchQuery, statusFilterValue, paymentFil
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-ink/10 truncate">
-                        <OrderRows orders={orders} searchQuery={searchQuery} visibleColumns={visibleColumns} statusFilterValue={statusFilterValue} paymentFilterValue={paymentFilterValue} />
+                        <OrderRows
+                            orders={orders}
+                            searchQuery={searchQuery}
+                            visibleColumns={visibleColumns}
+                            statusFilterValue={statusFilterValue}
+                            paymentFilterValue={paymentFilterValue}
+                            onViewOrder={(order) => setSelectedOrder(order)}
+                        />
                     </tbody>
                 </table>
             </div>
+            {/* ViewSingleOrder Drawer rendered at top-level outside the table container */}
+            <ViewSingleOrder
+                orderData={selectedOrder}
+                isOpen={!!selectedOrder}
+                onClose={() => setSelectedOrder(null)}
+            />
         </div>
     )
 }

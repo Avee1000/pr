@@ -1,18 +1,23 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useReducer, useState, useTransition } from "react";
 import { Share2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Popover,
-  PopoverContent,
-  PopoverDescription,
-  PopoverHeader,
-  PopoverTitle,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {  useRouter } from "next/navigation";
 import { generateQuoteLink } from "@/lib/orders/quotes/action";
+import { Alert } from "@/components/feedback/alert";
+import { LoadingState } from "../feedback/loading-state";
 
 interface ShareQuoteButtonProps {
   orderId: string;
@@ -24,6 +29,7 @@ export function ShareQuoteButton({ orderId }: ShareQuoteButtonProps) {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -49,44 +55,50 @@ export function ShareQuoteButton({ orderId }: ShareQuoteButtonProps) {
 
   return (
     <div className="inline-flex">
-      <Popover open={open} onOpenChange={handleOpenChange}>
-        <PopoverTrigger
-          render={
-            <button
-              type="button"
-              className="inline-flex items-center justify-center size-7 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all disabled:opacity-50"
-              title="Share quote"
-              disabled={isPending}
-            >
-              <Share2 className="size-3.5" />
-            </button>
-          }
-        />
-        <PopoverContent align="end" className="w-80 space-y-3">
-          <PopoverHeader>
-            <PopoverTitle>Share quote</PopoverTitle>
-            <PopoverDescription>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogTrigger render={
+          <button
+            type="button"
+            className="inline-flex items-center justify-center size-7 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all disabled:opacity-50"
+            title="Share quote"
+            disabled={isPending}
+          >
+            <Share2 className="size-3.5" />
+          </button>
+        }>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md space-y-1" showCloseButton={true}>
+          <DialogHeader>
+            <DialogTitle>Share quote</DialogTitle>
+            <DialogDescription>
               Send this link so the customer can view and approve the quote.
-            </PopoverDescription>
-          </PopoverHeader>
+            </DialogDescription>
+          </DialogHeader>
           {isPending && !link ? (
-            <p className="text-sm text-ink/60">Generating link...</p>
+            <LoadingState iconOnly />
           ) : error ? (
-            <p className="text-sm text-red-600">{error}</p>
+            <Alert variant="warning">{error}</Alert>
+            // <p className="text-sm text-red-600">{error}</p>
           ) : link ? (
             <div className="flex items-center gap-2">
               <Input readOnly value={link} className="h-8 text-xs" />
               <Button type="button" size="sm" onClick={handleCopy} className="h-8 shrink-0">
-                {copied ? "Copied!" : (
+                {copied ? (
+                  "Copied!"
+                ) : (
                   <>
-                    <Copy className="size-3.5" />Copy
+                    <Copy className="size-3.5" />
+                    Copy
                   </>
                 )}
               </Button>
             </div>
           ) : null}
-        </PopoverContent>
-      </Popover>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline">Cancel</Button>} />
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

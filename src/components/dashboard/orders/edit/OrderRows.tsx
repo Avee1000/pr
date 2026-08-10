@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { OrderRowsProps, Customer } from '@/lib/supabase/types';
-import { Edit2, Check, X, ChevronsUpDown } from 'lucide-react';
+import { Edit2, Check, X, ChevronsUpDown, LucideInfo } from 'lucide-react';
 import Delete from '../edit/DeleteOrder';
 import { orderStatusColors, paymentStatusColors } from '@/lib/supabase/types';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ export default function OrderRows({
     statusFilterValue,
     paymentFilterValue,
     visibleColumns,
+    onViewOrder,
 }: {
     orders: OrderRowsProps[];
     searchQuery: string;
@@ -37,6 +38,7 @@ export default function OrderRows({
         actions: boolean,
         createdAt: boolean,
     };
+    onViewOrder: (order: OrderRowsProps) => void;
 }) {
     const q = searchQuery.trim().toLowerCase();
     const statusFilter = statusFilterValue?.trim().toLowerCase();
@@ -46,7 +48,7 @@ export default function OrderRows({
     const [customerId, setCustomerId] = useState("");
     const [allCustomers, setAllCustomers] = useState<Customer[] | null>(null);
     const initialState: OrderState = { message: null, errors: {} };
-    
+
     const [editForm, setEditForm] = useState({
         customerName: '',
         description: '',
@@ -429,6 +431,15 @@ export default function OrderRows({
                                             <Edit2 className="size-3.5" />
                                         </Button>
                                         <Delete id={orderId} />
+                                        <Button
+                                            type="button"
+                                            onClick={() => onViewOrder(item)}
+                                            className="inline-flex items-center justify-center size-7 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all"
+                                            aria-label="View Order Details"
+                                            title="View Details"
+                                        >
+                                            <LucideInfo className="size-3.5 text-ink dark:text-gray-400" />
+                                        </Button>
                                     </>
                                 )}
                             </td>
