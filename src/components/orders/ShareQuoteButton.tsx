@@ -12,7 +12,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { generateQuoteLink } from "@/lib/orders/action";
+import { generateQuoteLink } from "@/lib/orders/quotes/action";
 
 interface ShareQuoteButtonProps {
   orderId: string;

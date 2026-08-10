@@ -35,7 +35,7 @@ export function QuoteView({ quote, children }: QuoteViewProps) {
               </Link>
             </span>
           </div>
-          <h1 className="font-heading text-2xl font-bold text-ink dark:text-muted-foreground">{quote.customerName}</h1>
+          <h1 className="font-heading max-w-[60%] text-2xl font-bold text-ink dark:text-muted-foreground">{quote.customerName}</h1>
         </div>
 
         <p className="text-ink/80  dark:text-muted-foreground">{quote.description}</p>

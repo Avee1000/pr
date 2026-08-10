@@ -116,3 +116,19 @@ GRANT EXECUTE ON FUNCTION get_quote_by_id(text) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_quote_by_id(text) TO service_role;
 
 DROP FUNCTION IF EXISTS public.get_quote_by_id(uuid);
+
+
+
+
+/////////////////////////////////////////////////////////////
+ALTER TABLE quotes
+  ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
+
+-- backfill existing rows (you must decide what value makes sense)
+-- example: set to now() (adjust as needed)
+UPDATE quotes
+SET expires_at = now()
+WHERE expires_at IS NULL;
+
+ALTER TABLE quotes
+  ALTER COLUMN expires_at SET NOT NULL;
