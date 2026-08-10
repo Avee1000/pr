@@ -11,7 +11,7 @@ export async function GET() {
 
     try {
         const { data, error } = await supabase
-            .rpc('get_quote_by_id', { p_quote_id: '95414a91-cfa9-4012-adbc-0fc2465de1fa' })
+            .rpc('get_quote_by_id', { p_quote_id: '37a0a548-0412-4b20-8bd0-3809ac1b701a' })
             .maybeSingle();
 
         console.log('rpc data:', data);
