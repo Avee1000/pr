@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { Share2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,22 +14,21 @@ import {
   DialogClose,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {  useRouter } from "next/navigation";
 import { generateQuoteLink } from "@/lib/orders/quotes/action";
 import { Alert } from "@/components/feedback/alert";
 import { LoadingState } from "../feedback/loading-state";
 
 interface ShareQuoteButtonProps {
+  label?: string;
   orderId: string;
 }
 
-export function ShareQuoteButton({ orderId }: ShareQuoteButtonProps) {
+export function ShareQuoteButton({ orderId, label }: ShareQuoteButtonProps) {
   const [isPending, startTransition] = useTransition();
   const [link, setLink] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
-  const router = useRouter();
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -56,17 +55,21 @@ export function ShareQuoteButton({ orderId }: ShareQuoteButtonProps) {
   return (
     <div className="inline-flex">
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogTrigger render={
-          <button
-            type="button"
-            className="inline-flex items-center justify-center size-7 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all disabled:opacity-50"
-            title="Share quote"
-            disabled={isPending}
-          >
-            <Share2 className="size-3.5" />
-          </button>
-        }>
-        </DialogTrigger>
+        <DialogTrigger
+          render={
+            <button
+              type="button"
+              className={`inline-flex items-center justify-start w-full gap-1.5 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all disabled:opacity-50 text-xs font-medium ${
+                label ? "h-7 px-2.5" : "size-7"
+              }`}
+              title="Share quote"
+              disabled={isPending}
+            >
+              <Share2 className="size-3.5 shrink-0" />
+              {label && <span>{label}</span>}
+            </button>
+          }
+        />
         <DialogContent className="sm:max-w-md space-y-1" showCloseButton={true}>
           <DialogHeader>
             <DialogTitle>Share quote</DialogTitle>
@@ -78,7 +81,6 @@ export function ShareQuoteButton({ orderId }: ShareQuoteButtonProps) {
             <LoadingState iconOnly />
           ) : error ? (
             <Alert variant="warning">{error}</Alert>
-            // <p className="text-sm text-red-600">{error}</p>
           ) : link ? (
             <div className="flex items-center gap-2">
               <Input readOnly value={link} className="h-8 text-xs" />

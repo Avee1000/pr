@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { OrderState, updateOrder } from '@/lib/orders/action';
 import { ShareQuoteButton } from '@/components/orders/ShareQuoteButton';
 import { toast } from 'sonner';
+import { KebabMenu } from '@/components/KebabMenu';
 
 export default function OrderRows({
     orders,
@@ -420,27 +421,33 @@ export default function OrderRows({
                                         </Button>
                                     </div>
                                 ) : (
-                                    <>
-                                        <ShareQuoteButton orderId={orderId} />
-                                        <Button
-                                            type="button"
-                                            onClick={() => handleEditClick(item)}
-                                            className="inline-flex items-center justify-center size-7 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all"
-                                            title="Edit"
+                                    <div className="text-right whitespace-nowrap px-2">
+                                        <KebabMenu groupClassName='flex flex-col gap-1.5'
+                                            afterSeparator={<Delete label='Delete Order' id={orderId} />}
                                         >
-                                            <Edit2 className="size-3.5" />
-                                        </Button>
-                                        <Delete id={orderId} />
-                                        <Button
-                                            type="button"
-                                            onClick={() => onViewOrder(item)}
-                                            className="inline-flex items-center justify-center size-7 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all"
-                                            aria-label="View Order Details"
-                                            title="View Details"
-                                        >
-                                            <LucideInfo className="size-3.5 text-ink dark:text-gray-400" />
-                                        </Button>
-                                    </>
+                                            <ShareQuoteButton label="Share Quote" orderId={orderId} />
+                                            <Button
+                                                type="button"
+                                                onClick={() => handleEditClick(item)}
+                                                className="h-7 inline-flex items-center justify-start gap-1.5 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all disabled:opacity-50 text-xs font-medium"
+                                                title="Edit"
+                                            >
+                                                <Edit2 className="size-3.5 shrink-0" />
+                                                <span>Edit Order</span>
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                onClick={() => onViewOrder(item)}
+                                                className="h-7  inline-flex items-center justify-start gap-1.5 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all disabled:opacity-50 text-xs font-medium"
+                                                aria-label="View Order Details"
+                                                title="View Details"
+                                            >
+                                                <LucideInfo className="size-3.5 text-ink dark:text-gray-400" />
+                                                <span>Details</span>
+                                            </Button>
+
+                                        </KebabMenu>
+                                    </div>
                                 )}
                             </td>
                         )}

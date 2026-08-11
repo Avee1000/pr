@@ -14,10 +14,11 @@ import {
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button";
 interface DeleteProps {
+    label?: string;
     id: string | number;
 }
 
-export default function Delete({ id }: DeleteProps) {
+export default function Delete({ id, label }: DeleteProps) {
     const [isDeleting, setIsDeleting] = useState(false)
     const [isOpen, setIsOpen] = useState(false);
 
@@ -41,7 +42,7 @@ export default function Delete({ id }: DeleteProps) {
             });
         } catch (error) {
             console.error(error);
-        } 
+        }
     }
 
     return (
@@ -49,10 +50,12 @@ export default function Delete({ id }: DeleteProps) {
             <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger render={<button
                     style={{ color: '#FF4A3C' }}
-                    className="inline-flex items-center justify-center size-7 rounded-lg border border-action/30 bg-action/10 hover:bg-action/20 transition-all disabled:opacity-50"
+                    className={`inline-flex items-center w-full gap-1.5 rounded-lg border border-action/30 bg-action/10 hover:bg-action/20 transition-all disabled:opacity-50 text-xs font-medium ${label ? "h-7 px-3 justify-start" : " justify-center size-7"
+                        }`}
                     title="Delete Order"
                 >
                     <Trash2 className="size-3.5" />
+                    {label && <span>{label}</span>}
                 </button>} />
                 <PopoverContent>
                     <PopoverHeader>
@@ -62,11 +65,11 @@ export default function Delete({ id }: DeleteProps) {
                         </PopoverDescription>
                     </PopoverHeader>
                     <div className="flex gap-2 justify-center">
-                        <Button 
-                        onClick={() => setIsOpen(false)} 
-                        variant={"outline"} 
-                        className={"bg-white px-5"}
-                        disabled={isDeleting}>No</Button>
+                        <Button
+                            onClick={() => setIsOpen(false)}
+                            variant={"outline"}
+                            className={"bg-white px-5"}
+                            disabled={isDeleting}>No</Button>
                         <Button variant={"destructive"}
                             className={"bg-action text-white border-action px-5"}
                             disabled={isDeleting}

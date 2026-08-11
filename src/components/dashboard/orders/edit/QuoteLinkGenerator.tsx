@@ -85,12 +85,15 @@ export default function QuoteLinkGenerator({ orderId }: { orderId: string }) {
                     </Button>
                 </div>
             )}
-            <div className="flex flex-row items-center mt-2 gap-2">
+            <div className="flex flex-row items-center mt-2 gap-2 ">
                 {expiry &&
-                    <p className="text-xs text-muted-foreground">
-                        Link expires: {expiry.toLocaleString()}
-                    </p>}
-                <Information detail="Generate a new link after the link expiration date (links become inactive after expiry)" />
+                    <>
+                        <p className="text-xs text-muted-foreground">
+                            Link expires: {expiry.toLocaleString()}
+                        </p>
+                        <Information detail="Generate a new link after the link expiration date (links become inactive after expiry)" />
+                    </>
+                }
             </div>
         </div>
     );

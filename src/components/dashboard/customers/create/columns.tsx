@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Customer } from '@/lib/supabase/types'
 import Delete from '../edit/DeleteCustomer'
 import { type DataTableFeatures } from "./data-table-features"
+import { KebabMenu } from '@/components/KebabMenu'
 
 const columnHelper = createColumnHelper<DataTableFeatures, Customer>()
 
@@ -83,15 +84,19 @@ export const columns = columnHelper.columns([
     header: () => <div className="text-right px-2">Actions</div>,
     id: "actions",
     cell: ({ row }) => (
-      <div className="text-right space-x-1.5 whitespace-nowrap px-2">
-        <Link
-          href={`/dashboard/customers/edit/${row.original.id}`}
-          className="inline-flex items-center justify-center size-7 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 dark:text-gray-400 text-ink transition-all"
-          title="View / Edit"
+      <div className="text-right whitespace-nowrap px-2">
+        <KebabMenu groupClassName='flex flex-col gap-1'
+          afterSeparator={<Delete label='Delete' id={row.original.id} />}
         >
-          <Edit2 className="size-3.5" />
-        </Link>
-        <Delete id={row.original.id} />
+          <Link
+            href={`/dashboard/customers/edit/${row.original.id}`}
+            className="h-7 px-3 inline-flex items-center justify-start gap-1.5 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all disabled:opacity-50 text-xs font-medium"
+            title="View / Edit"
+          >
+            <Edit2 className="size-3.5" />
+            <span>Edit</span>
+          </Link>
+        </KebabMenu>
       </div>
     ),
   }),

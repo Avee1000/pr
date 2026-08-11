@@ -107,7 +107,7 @@ export default function NotificationIcon() {
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 top-19 bg-black/70 dark:bg-black/40 z-40 transition-opacity"
+          className="fixed inset-0 top-19 bg-black/70 backdrop-blur-[1px] dark:bg-black/40 z-40 transition-opacity"
           aria-hidden="true"
         />
       )}
