@@ -13,7 +13,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { selectAllCustomers } from '@/lib/customers/action';
 import { cn } from "@/lib/utils";
 import { OrderState, updateOrder } from '@/lib/orders/action';
-import { ShareQuoteButton } from '@/components/orders/ShareQuoteButton';
+import { ShareQuoteButton } from '@/components/quote/ShareQuoteButton';
 import { toast } from 'sonner';
 import { KebabMenu } from '@/components/KebabMenu';
 

@@ -8,19 +8,20 @@ import UserMenu from "./UserMenu";
 
 export function AuthHeaderActions({ isSignedIn, user }: { isSignedIn: boolean; user: any }) {
   const pathname = usePathname();
-  const onAuthPage = pathname === "/login" || pathname === "/signup";
+  const AUTH_ROUTES = new Set(["/login", "/signup", "/forgot-password", "/reset-password"]);
+  const onAuthPage = AUTH_ROUTES.has(pathname) || pathname.startsWith("/quote");
 
   if (isSignedIn) {
     return (
-        // <form action={signOut}>
-        //   <button
-        //     type="submit"
-        //     className="rounded-md px-3 py-1.5 text-sm font-semibold text-ink hover:bg-secondary dark:text-white"
-        //   >
-        //     Sign out
-        //   </button>
-        // </form>
-        <UserMenu user={user} />
+      // <form action={signOut}>
+      //   <button
+      //     type="submit"
+      //     className="rounded-md px-3 py-1.5 text-sm font-semibold text-ink hover:bg-secondary dark:text-white"
+      //   >
+      //     Sign out
+      //   </button>
+      // </form>
+      <UserMenu user={user} />
     );
   }
 

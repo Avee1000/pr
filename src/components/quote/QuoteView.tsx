@@ -24,7 +24,7 @@ interface QuoteViewProps {
 export function QuoteView({ quote, children }: QuoteViewProps) {
   return (
     <div className="w-full h-[calc(100vh-20rem)] flex items-center max-w-2xl mx-auto p-6 sm:p-10">
-      <div className="w-full rounded-xl border dark:border-ink-dark border-ink/10 shadow-sm p-6 sm:p-8 space-y-6">
+      <div className="w-full rounded-xl dark:bg-ink border dark:border-ink-dark border-ink/10 shadow-sm p-6 sm:p-8 space-y-6">
         <div>
           <div className="flex flex-row w-full justify-between">
             <p className="text-sm text-ink/60 dark:text-muted-foreground/60">Quote for</p>
