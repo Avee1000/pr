@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getCache, setCache, CacheKeys, TTL_SECONDS } from "@/lib/redis/cache";
 
 export interface CashFlowSummary {
   monthlyRevenue: number;
@@ -29,6 +30,11 @@ export async function getCashFlowSummary(): Promise<CashFlowSummary> {
     return EMPTY_SUMMARY;
   }
 
+  const cacheKey = CacheKeys.cashflow(user.id);
+
+  const cached = await getCache<CashFlowSummary>(cacheKey);
+  if (cached !== null) return cached;
+
   const { data: orders, error } = await supabase
     .from("orders")
     .select("price, payment_status, due_date, paid_at")
@@ -36,10 +42,12 @@ export async function getCashFlowSummary(): Promise<CashFlowSummary> {
 
   if (error || !orders) {
     console.error("Supabase select orders error (cash flow):", error);
+    await setCache(cacheKey, EMPTY_SUMMARY, TTL_SECONDS.SHORT);
     return EMPTY_SUMMARY;
   }
 
   if (orders.length === 0) {
+    await setCache(cacheKey, EMPTY_SUMMARY, TTL_SECONDS.SHORT);
     return EMPTY_SUMMARY;
   }
 
@@ -79,7 +87,7 @@ export async function getCashFlowSummary(): Promise<CashFlowSummary> {
     receivablesCount += 1;
   }
 
-  return {
+  const result = {
     monthlyRevenue: Number(monthlyRevenue.toFixed(2)),
     receivablesTotal: Number(receivablesTotal.toFixed(2)),
     receivablesCount,
@@ -87,4 +95,7 @@ export async function getCashFlowSummary(): Promise<CashFlowSummary> {
     overdueCount,
     hasAnyOrders: true,
   };
+
+  await setCache(cacheKey, result, TTL_SECONDS.SHORT);
+  return result;
 }

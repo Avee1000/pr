@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getCache, setCache, CacheKeys, TTL_SECONDS } from '@/lib/redis/cache';
 
 interface Notification {
   id: string;
@@ -13,6 +14,15 @@ export async function GET() {
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const cacheKey = CacheKeys.notifications(user.id);
+
+  const cached = await getCache<Notification[]>(cacheKey);
+  if (cached !== null) {
+    return NextResponse.json(cached, {
+      headers: { 'Cache-Control': 'no-store' }
+    });
   }
 
   const notifications: Notification[] = [];
@@ -83,7 +93,10 @@ export async function GET() {
     });
   }
 
-  return NextResponse.json(notifications, {
+  const response = NextResponse.json(notifications, {
     headers: { 'Cache-Control': 'no-store' }
   });
+
+  await setCache(cacheKey, notifications, TTL_SECONDS.SHORT);
+  return response;
 }

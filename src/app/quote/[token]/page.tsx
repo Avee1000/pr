@@ -4,6 +4,7 @@ import { ApproveQuoteButton } from "@/components/orders/ApproveQuoteButton";
 import { EmptyState } from "@/components/feedback/empty";
 import { FilePlus, SearchX, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getCache, setCache, CacheKeys, TTL_SECONDS } from "@/lib/redis/cache";
 interface QuotePageProps {
   params: Promise<{ token: string }>;
 }
@@ -11,6 +12,17 @@ interface QuotePageProps {
 export default async function QuotePage({ params }: QuotePageProps) {
   const { token } = await params;
   const supabase = await createClient();
+
+  const cacheKey = CacheKeys.quote(token);
+
+  const cached = await getCache<QuoteData>(cacheKey);
+  if (cached) {
+    return (
+      <QuoteView quote={cached}>
+        <ApproveQuoteButton token={token} />
+      </QuoteView>
+    );
+  }
 
   const { data, error } = await supabase.rpc("get_quote_by_token", { p_token: token });
   const row = Array.isArray(data) ? data[0] : null;
@@ -38,6 +50,8 @@ export default async function QuotePage({ params }: QuotePageProps) {
     orderStatus: row.order_status,
     customerName: row.customer_name,
   };
+
+  await setCache(cacheKey, quote, TTL_SECONDS.LONG);
 
   return (
     <QuoteView quote={quote}>

@@ -52,7 +52,7 @@ export default function ViewSingleOrder({ orderData, isOpen, onClose }: ViewSing
             {/* Backdrop Overlay */}
             <div
                 onClick={onClose}
-                className={`fixed inset-0 bg-black/70 z-40 transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu ${
+                className={`fixed inset-0 bg-black/70 backdrop-blur-[1px] z-40 transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu ${
                     isOpen && activeOrder ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
                 }`}
                 aria-hidden="true"

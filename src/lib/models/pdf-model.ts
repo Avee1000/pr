@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { getCache, setCache, CacheKeys, TTL_SECONDS } from '@/lib/redis/cache';
 
 export interface QuoteData {
   quoteStatus: 'pending' | 'approved';
@@ -23,6 +24,11 @@ interface RpcQuoteRow {
 }
 
 export const getQuoteByQuoteId = async (quoteId: string): Promise<QuoteData | null> => {
+  const cacheKey = CacheKeys.quote(quoteId);
+
+  const cached = await getCache<QuoteData>(cacheKey);
+  if (cached !== null) return cached;
+
   const supabase = await createClient();
   const { data, error } = await supabase
     .rpc('get_quote_by_id', { p_quote_id: quoteId })
@@ -31,7 +37,7 @@ export const getQuoteByQuoteId = async (quoteId: string): Promise<QuoteData | nu
   if (error) throw error;
   if (!data) return null;
 
-  return {
+  const result = {
     quoteStatus: data.quote_status,
     approvedAt: data.approved_at,
     quoteId: data.quote_id,
@@ -41,4 +47,7 @@ export const getQuoteByQuoteId = async (quoteId: string): Promise<QuoteData | nu
     orderStatus: data.order_status ?? '',
     customerName: data.customer_name ?? 'N/A',
   };
+
+  await setCache(cacheKey, result, TTL_SECONDS.LONG);
+  return result;
 };

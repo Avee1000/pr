@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { delCache, CacheKeys } from "@/lib/redis/cache";
 
 interface RouteContext {
   params: Promise<{ token: string }>;
@@ -19,6 +20,8 @@ export async function POST(_request: Request, { params }: RouteContext) {
   if (!row) {
     return NextResponse.json({ message: "Quote not found." }, { status: 404 });
   }
+
+  delCache(CacheKeys.quote(token)).catch(() => {});
 
   return NextResponse.json(
     { status: row.quote_status, approvedAt: row.approved_at },

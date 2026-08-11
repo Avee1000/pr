@@ -3,6 +3,8 @@
 import { createClient } from "../supabase/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getCache, setCache, delPattern, CacheKeys, TTL_SECONDS } from "../redis/cache";
+import type { Order, Customer } from "../supabase/types";
 
 const MaterialUsageSchema = z.object({
     material_cost_id: z.string().uuid("Invalid material selected."),
@@ -209,6 +211,7 @@ export async function createOrder(prevState: OrderState, formData: FormData): Pr
         }
 
         revalidatePath('/dashboard');
+        delPattern(`orders:${user.id}`).catch(() => {});
         return { success: true, message: 'Order created successfully!' };
     } catch (error) {
         console.error("Unexpected error:", error);
@@ -287,41 +290,72 @@ export async function createOrder(prevState: OrderState, formData: FormData): Pr
 
 
 
-export async function selectAllOrders() {
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+export type SelectAllOrdersResult = {
+  allOrders: Order;
+  customer: Customer;
+}[] | null;
 
-    if (authError || !user) {
-        throw new Error("Unauthorized: User not logged in.");
-    }
+export async function selectAllOrders(): Promise<SelectAllOrdersResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
+  if (authError || !user) {
+    throw new Error("Unauthorized: User not logged in.");
+  }
+
+  const cacheKey = CacheKeys.orders(user.id);
+
+  // Helper function: Query Supabase, transform data, and update Redis
+  const fetchAndCache = async (): Promise<SelectAllOrdersResult> => {
     try {
-        const { data, error } = await supabase
-            .from('orders')
-            .select(`
-                *,
-                customers ( id, name, email )
-            `)
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: true });
-        if (error) throw error;
+      const { data, error } = await supabase
+        .from("orders")
+        .select(`
+          *,
+          customers ( id, name, email )
+        `)
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true });
 
-        if (!data) {
-            return [];
-        }
+      if (error) throw error;
 
-        const mappedData = data.map(order => {
-            const { customers, ...allOrders } = order;
-            return {
-                allOrders,
-                customer: customers
-            };
-        });
-        return mappedData;
+      if (!data || data.length === 0) {
+        await setCache(cacheKey, [], TTL_SECONDS.DEFAULT);
+        return [];
+      }
+
+      const mappedData = data.map((order) => {
+        const { customers, ...allOrders } = order;
+        return {
+          allOrders,
+          customer: customers,
+        };
+      });
+
+      await setCache(cacheKey, mappedData, TTL_SECONDS.DEFAULT);
+      return mappedData;
     } catch (error) {
-        console.error("Unexpected error:", error);
-        return null;
+      console.error("Unexpected error in fetchAndCache (orders):", error);
+      return null;
     }
+  };
+
+  // 1. Try fetching from Redis cache
+  const cached = await getCache<SelectAllOrdersResult>(cacheKey);
+
+  if (cached !== null) {
+    // CACHE HIT: Return cached data instantly, trigger background revalidation without await
+    fetchAndCache().catch((err) =>
+      console.error("Background cache revalidation failed for orders:", err)
+    );
+    return cached;
+  }
+
+  // 2. CACHE MISS: Fetch from database immediately
+  return await fetchAndCache();
 }
 
 // export async function selectOneCustomer(id: string) {
@@ -371,6 +405,7 @@ export async function deleteOrder(id: string | number) {
         }
 
         revalidatePath('/dashboard/orders');
+        delPattern(`orders:${user.id}`).catch(() => {});
         return { success: true, message: 'Order deleted successfully!' };
     } catch (error) {
         console.error("Unexpected error:", error);
@@ -440,6 +475,7 @@ export async function updateOrder(id: string | number, prevState: OrderState, fo
 
         revalidatePath('/dashboard/orders');
         revalidatePath('/dashboard');
+        delPattern(`orders:${user.id}`).catch(() => {});
         return { success: true, message: 'Order updated successfully!' };
     } catch (error) {
         console.error("Unexpected error:", error);
@@ -481,6 +517,7 @@ export async function updateOrderStatus(id: string, status: string) {
 
         revalidatePath('/dashboard/orders/board');
         revalidatePath('/dashboard/orders');
+        delPattern(`orders:${user.id}`).catch(() => {});
         return { success: true, message: 'Order moved.' };
     } catch (error) {
         console.error("Unexpected error:", error);

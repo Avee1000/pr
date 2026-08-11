@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "../supabase/server";
 import type { LaborCost, Material, TargetProfit } from "../supabase/types";
+import { getCache, setCache, delPattern, CacheKeys, TTL_SECONDS } from "../redis/cache";
 
 function formatDbErrorMessage(error: { message: string }, fallback: string) {
   if (error.message.includes("Could not find the table 'public.material_costs'")) {
@@ -104,6 +105,7 @@ export async function createMaterialsBatch(
     }
 
     revalidatePath("/dashboard/costs/materials");
+    delPattern(`materials:*`).catch(() => {});
     return { success: true, message: "Materials saved successfully!" };
   } catch (error) {
     console.error("Unexpected create materials error:", error);
@@ -142,6 +144,7 @@ export async function updateMaterial(
     }
 
     revalidatePath("/dashboard/costs/materials");
+    delPattern(`materials:*`).catch(() => {});
     return { success: true, message: "Material updated successfully!" };
   } catch (error) {
     console.error("Unexpected update material error:", error);
@@ -161,7 +164,9 @@ export async function selectAllMaterials(): Promise<Material[]> {
     return [];
   }
 
-  return (data ?? []) as Material[];
+  const materials = (data ?? []) as Material[];
+  await setCache(CacheKeys.materials("global"), materials, TTL_SECONDS.MEDIUM);
+  return materials;
 }
 
 export async function upsertLaborCost(
@@ -219,6 +224,7 @@ export async function upsertLaborCost(
     }
 
     revalidatePath("/dashboard/costs/labor");
+    delPattern(`laborCost:*`).catch(() => {});
     return {
       success: true,
       message: mode === "update" ? "Labor cost updated successfully!" : "Labor cost saved successfully!",
@@ -231,6 +237,10 @@ export async function upsertLaborCost(
 
 export async function selectLaborCost(): Promise<LaborCost | null> {
   const supabase = await createClient();
+
+  const cached = await getCache<LaborCost>(CacheKeys.laborCost("global"));
+  if (cached !== null) return cached;
+
   const { data, error } = await supabase
     .from("labor_costs")
     .select("*")
@@ -242,7 +252,9 @@ export async function selectLaborCost(): Promise<LaborCost | null> {
     return null;
   }
 
-  return (data?.[0] as LaborCost | undefined) ?? null;
+  const result = (data?.[0] as LaborCost | undefined) ?? null;
+  await setCache(CacheKeys.laborCost("global"), result, TTL_SECONDS.MEDIUM);
+  return result;
 }
 
 export async function upsertTargetProfit(
@@ -300,6 +312,7 @@ export async function upsertTargetProfit(
     }
 
     revalidatePath("/dashboard/costs/target-profit");
+    delPattern(`targetProfit:*`).catch(() => {});
     return {
       success: true,
       message: mode === "update" ? "Target profit updated successfully!" : "Target profit saved successfully!",
@@ -312,6 +325,10 @@ export async function upsertTargetProfit(
 
 export async function selectTargetProfit(): Promise<TargetProfit | null> {
   const supabase = await createClient();
+
+  const cached = await getCache<TargetProfit>(CacheKeys.targetProfit("global"));
+  if (cached !== null) return cached;
+
   const { data, error } = await supabase
     .from("target_profits")
     .select("*")
@@ -323,7 +340,9 @@ export async function selectTargetProfit(): Promise<TargetProfit | null> {
     return null;
   }
 
-  return (data?.[0] as TargetProfit | undefined) ?? null;
+  const result = (data?.[0] as TargetProfit | undefined) ?? null;
+  await setCache(CacheKeys.targetProfit("global"), result, TTL_SECONDS.MEDIUM);
+  return result;
 }
 
 export async function deleteMaterial(
