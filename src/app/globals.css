@@ -207,28 +207,6 @@ strong {
   -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 
-.no-scrollbars::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.no-scrollbars::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.no-scrollbars::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 4px;
-}
-
-.no-scrollbars::-webkit-scrollbar-thumb:hover {
-  background: #d4d4d4;
-}
-
-.no-scrollbars::-webkit-scrollbar-button {
-  width: 0;
-  height: 0;
-}
 
 
 @layer base {

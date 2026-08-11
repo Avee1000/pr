@@ -90,7 +90,7 @@ export const columns = columnHelper.columns([
         >
           <Link
             href={`/dashboard/customers/edit/${row.original.id}`}
-            className="h-7 px-3 inline-flex items-center justify-start gap-1.5 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all disabled:opacity-50 text-xs font-medium"
+            className="h-7 px-3 inline-flex items-center justify-start gap-1.5 rounded-lg dark:bg-ink dark:hover:bg-muted-foreground/20 hover:bg-ink/10 text-ink dark:text-muted-foreground transition-all disabled:opacity-50 text-xs font-medium"
             title="View / Edit"
           >
             <Edit2 className="size-3.5" />

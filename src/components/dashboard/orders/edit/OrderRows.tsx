@@ -429,7 +429,7 @@ export default function OrderRows({
                                             <Button
                                                 type="button"
                                                 onClick={() => handleEditClick(item)}
-                                                className="h-7 inline-flex items-center justify-start gap-1.5 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all disabled:opacity-50 text-xs font-medium"
+                                                className="h-7 inline-flex items-center justify-start gap-1.5 rounded-lg bg-white dark:bg-ink dark:hover:bg-muted-foreground/20 hover:bg-ink/10 text-ink dark:text-muted-foreground transition-all disabled:opacity-50 text-xs font-medium"
                                                 title="Edit"
                                             >
                                                 <Edit2 className="size-3.5 shrink-0" />
@@ -438,7 +438,7 @@ export default function OrderRows({
                                             <Button
                                                 type="button"
                                                 onClick={() => onViewOrder(item)}
-                                                className="h-7  inline-flex items-center justify-start gap-1.5 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all disabled:opacity-50 text-xs font-medium"
+                                                className="h-7  inline-flex items-center justify-start gap-1.5 rounded-lg bg-white dark:bg-ink dark:hover:bg-muted-foreground/20 hover:bg-ink/10 text-ink dark:text-muted-foreground transition-all disabled:opacity-50 text-xs font-medium"
                                                 aria-label="View Order Details"
                                                 title="View Details"
                                             >

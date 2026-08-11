@@ -79,7 +79,7 @@ export function ShareQuoteButton({ orderId, label }: ShareQuoteButtonProps) {
           render={
             <button
               type="button"
-              className={`inline-flex items-center justify-start w-full gap-1.5 rounded-lg border border-ink/20 bg-white hover:bg-ink/10 text-ink dark:text-gray-400 transition-all disabled:opacity-50 text-xs font-medium ${label ? "h-7 px-2.5" : "size-7"
+              className={`inline-flex items-center justify-start w-full gap-1.5 rounded-lg dark:bg-ink dark:hover:bg-muted-foreground/20 hover:bg-ink/10 text-ink dark:text-muted-foreground transition-all disabled:opacity-50 text-xs font-medium ${label ? "h-7 px-2.5" : "size-7"
                 }`}
               title="Share quote"
               disabled={isPending}

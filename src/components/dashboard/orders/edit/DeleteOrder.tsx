@@ -52,7 +52,7 @@ export default function Delete({ id, label }: DeleteProps) {
             <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger render={<button
                     style={{ color: '#FF4A3C' }}
-                    className={`inline-flex items-center w-full gap-1.5 rounded-lg border border-action/30 bg-action/10 hover:bg-action/20 transition-all disabled:opacity-50 text-xs font-medium ${label ? "h-7 px-3 justify-start" : " justify-center size-7"
+                    className={`inline-flex items-center w-full gap-1.5 rounded-lg hover:bg-action/20 transition-all disabled:opacity-50 text-xs font-medium ${label ? "h-7 px-3 justify-start" : " justify-center size-7"
                         }`}
                     title="Delete Order"
                 >
