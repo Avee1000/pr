@@ -1,0 +1,136 @@
+// lib/email/templates.ts
+import { sendEmail } from './index';
+
+interface QuoteEmailParams {
+  toEmail: string;
+  toName: string;
+  quoteNumber: string;
+  amount: string;
+  quoteUrl: string;
+  expiresAt?: string;
+  logoUrl?: string;
+}
+
+export async function sendQuoteEmail({
+  toEmail,
+  toName,
+  quoteNumber,
+  amount,
+  quoteUrl,
+  expiresAt = '14 days',
+  logoUrl = 'https://priceright-chi.vercel.app/_next/image?url=%2Fandroid-chrome-512x512.png&w=256&q=75',
+}: QuoteEmailParams) {
+  return sendEmail({
+    toEmail,
+    toName,
+    subject: `Your Quote ${quoteNumber} is Ready`,
+    htmlContent: `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Your Quote is Ready</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap');
+          </style>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #F8FAFC; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #F8FAFC; padding: 40px 16px;">
+            <tr>
+              <td align="center">
+                <!-- Main Container -->
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 560px; background-color: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+                  
+                  <!-- Top Brand Accent Bar (#FFC200) -->
+                  <tr>
+                    <td style="background-color: #FFC200; height: 6px; font-size: 0; line-height: 0;">&nbsp;</td>
+                  </tr>
+
+                  <!-- Header & Logo -->
+                  <tr>
+                    <td style="padding: 32px 32px 16px 32px;">
+                      ${
+                        logoUrl
+                          ? `<img src="${logoUrl}" alt="PriceRight" width="50" style="display: block; width: 50px; max-width: 100%; height: auto; border: 0; outline: none; text-decoration: none;" />`
+                          : `<span style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 20px; color: #1A1A1A; letter-spacing: -0.5px;">Price<span style="color: #1A1A1A; background-color: #FFC200; padding: 2px 6px; border-radius: 4px;">Right</span></span>`
+                      }
+                    </td>
+                  </tr>
+
+                  <!-- Body Content -->
+                  <tr>
+                    <td style="padding: 16px 32px 32px 32px;">
+                      <h1 style="margin: 0 0 16px 0; font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; color: #1A1A1A; letter-spacing: -0.3px; line-height: 1.3;">
+                        Your Quote is Ready
+                      </h1>
+                      
+                      <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #1A1A1A;">
+                        Hi ${toName},
+                      </p>
+                      
+                      <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #475569;">
+                        Thanks for using PriceRight! We've prepared quote <strong style="color: #1A1A1A;">${quoteNumber}</strong> for you. You can review the full breakdown and accept it online using the link below. Please note that this quote is valid until <strong style="color: #1A1A1A;">${expiresAt}</strong>.
+                      </p>
+
+                      <!-- Summary Card -->
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 28px;">
+                        <tr>
+                          <td style="padding: 20px; font-size: 14px; color: #1A1A1A;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                              <tr>
+                                <td style="color: #475569; font-weight: 500; padding-bottom: 10px;">Quote Number:</td>
+                                <td align="right" style="font-weight: 600; color: #1A1A1A; padding-bottom: 10px;">${quoteNumber}</td>
+                              </tr>
+                              <tr>
+                                <td style="color: #475569; font-weight: 500; padding-bottom: 10px;">Total Estimate:</td>
+                                <td align="right" style="font-weight: 700; color: #1A1A1A; font-size: 18px; padding-bottom: 10px; font-variant-numeric: tabular-nums;">${amount}</td>
+                              </tr>
+                              <tr>
+                                <td style="color: #475569; font-weight: 500;">Expires In:</td>
+                                <td align="right" style="color: #1A1A1A;">${expiresAt}</td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <!-- Primary Action CTA (#FF4A3C) -->
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 28px;">
+                        <tr>
+                          <td align="center">
+                            <a href="${quoteUrl}" target="_blank" style="display: inline-block; background-color: #FFC200; color: #1A1A1A; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 32px; border-radius: 8px; box-shadow: 0 3px 6px rgba(255, 74, 60, 0.2); text-align: center;">
+                              View & Accept Quote
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <!-- Fallback URL -->
+                      <p style="margin: 0 0 6px 0; font-size: 13px; color: #64748B;">
+                        If the button doesn't work, copy and paste this link into your browser:
+                      </p>
+                      <p style="margin: 0; font-size: 12px; word-break: break-all;">
+                        <a href="${quoteUrl}" style="color: #1A1A1A; text-decoration: underline;">${quoteUrl}</a>
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Footer -->
+                  <tr>
+                    <td style="background-color: #F8FAFC; border-top: 1px solid #E2E8F0; padding: 20px 32px; text-align: center;">
+                      <p style="margin: 0; font-size: 12px; color: #64748B; line-height: 1.5;">
+                        If you have any questions about this estimate, feel free to reply directly to this email.
+                      </p>
+                    </td>
+                  </tr>
+
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+      </html>
+    `,
+  });
+}

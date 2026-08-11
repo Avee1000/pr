@@ -2,6 +2,82 @@
 
 import { createClient } from "../../supabase/server";
 import crypto from "node:crypto";
+import { sendQuoteEmail } from '@/lib/email/quote';
+
+//  Define the interface matching your RPC output
+export interface QuoteOrderInfo {
+  quote_status: string;
+  share_token: string;
+  approved_at: string | null;
+  order_description: string;
+  order_id: string;
+  quote_id: string;
+  order_price: string;
+  order_due_date: string;
+  order_status: string;
+  customer_name: string;
+  customer_email: string;
+  expires_at: string;
+}
+
+export async function sendTokenEmail(orderId: string) {
+  const supabase = await createClient();
+
+  // 2. Authentication Check
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Unauthorized: you must be logged in." };
+  }
+
+  // 3. Fetch data via RPC with TypeScript generic typing
+  const { data, error } = await supabase.rpc("get_allinfo_by_id", {
+    p_order_id: orderId,
+  });
+
+  if (error || !data) {
+    console.error("Supabase RPC Error:", error);
+    return { error: "Quote information not found or access denied." };
+  }
+
+  // Handle case if RPC returns an array vs single object
+  const info: QuoteOrderInfo = (Array.isArray(data) ? data[0] : data) as QuoteOrderInfo;
+
+  if (!info) {
+    return { error: "No quote data found for this order ID." };
+  }
+
+  // 4. Format price & dynamic quote URL
+  const formattedPrice = `$${parseFloat(info.order_price).toFixed(2)}`;
+  const quoteUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/quote/${info.share_token}`;
+
+  // Calculate human-readable expiration (e.g., "14 days")
+  const expiryDate = new Date(info.expires_at);
+  const formattedExpiry = expiryDate.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  // 5. Trigger email template
+  try {
+    await sendQuoteEmail({
+      toEmail: info.customer_email,
+      toName: info.customer_name,
+      quoteNumber: info.quote_id.substring(0, 8).toUpperCase(), // Clean short quote ref (e.g. 7C0665C4)
+      amount: formattedPrice,
+      quoteUrl: quoteUrl,
+      expiresAt: formattedExpiry,
+    });
+
+    return { success: true, message: "Quote email sent successfully."};
+  } catch (emailError: any) {
+    console.error("Failed to send quote email:", emailError);
+    return { error: emailError.message || "Failed to deliver quote email." };
+  }
+}
 
 export async function generateQuoteLink(
     orderId: string,
@@ -158,6 +234,7 @@ export async function shareToken(
         expiresAt: existingQuote.expires_at,
     };
 }
+
 
 // export async function generateQuoteLink(
 //   orderId: string,

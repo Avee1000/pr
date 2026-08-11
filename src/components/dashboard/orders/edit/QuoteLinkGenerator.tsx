@@ -81,7 +81,7 @@ export default function QuoteLinkGenerator({ orderId }: { orderId: string }) {
                         disabled={!link || isPending}
                     >
                         <Copy className="size-3.5" />
-                        <span className="text-xs">{copied ? "Copied" : "Copy"}</span>
+                        {/* <span className="text-xs">{copied ? "Copied" : "Copy"}</span> */}
                     </Button>
                 </div>
             )}
