@@ -3,8 +3,9 @@
 import { createClient } from "../../supabase/server";
 import crypto from "node:crypto";
 import { sendQuoteEmail } from '@/lib/email/quote';
-import { cookies } from 'next/headers';
 import { setVerifiedQuoteCookie } from "@/lib/cookies/auth-cookie";
+import { getBaseUrl } from "@/utils/url";
+
 
 //  Define the interface matching your RPC output
 export interface QuoteOrderInfo {
@@ -63,7 +64,8 @@ export async function sendTokenEmail(orderId: string) {
 
     // 4. Format price & dynamic quote URL
     const formattedPrice = `$${parseFloat(info.order_price).toFixed(2)}`;
-    const quoteUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/quote/${info.share_token}`;
+    const baseUrl = await getBaseUrl();
+    const quoteUrl = `${baseUrl}/quote/${info.share_token}`;
 
     // Calculate human-readable expiration (e.g., "14 days")
     const expiryDate = new Date(info.expires_at);
@@ -78,7 +80,7 @@ export async function sendTokenEmail(orderId: string) {
         await sendQuoteEmail({
             toEmail: info.customer_email,
             toName: info.customer_name,
-            quoteNumber: info.quote_id.substring(0, 8).toUpperCase(), // Clean short quote ref (e.g. 7C0665C4)
+            quoteNumber: info.quote_id.substring(0, 8).toUpperCase(), 
             amount: formattedPrice,
             quoteUrl: quoteUrl,
             expiresAt: formattedExpiry,

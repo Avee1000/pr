@@ -33,14 +33,24 @@ export async function sendQuoteEmail({
           <title>Your Quote is Ready</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap');
+
+            /* Email Responsive Styles */
+            @media only screen and (max-width: 600px) {
+              .bg-body {
+                background-color: transparent !important; /* !important is required to override inline styles */
+              }
+              .responsive-table {
+                width: 100% !important;
+              }
+            }
           </style>
         </head>
-        <body style="margin: 0; padding: 0; background-color: #F8FAFC; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased;">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #F8FAFC; padding: 40px 5px;">
+        <body style="margin: 0; padding: 0; background-color: #F8FAFC; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased;" class="bg-body">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #F8FAFC; padding: 40px 5px;" class="bg-body">
             <tr>
               <td align="center" valign="top">
                 <!-- Main Container -->
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 560px; background-color: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 560px; background-color: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);" class="responsive-table">
                   
                   <!-- Top Brand Accent Bar (#FFC200) -->
                   <tr>
@@ -50,10 +60,9 @@ export async function sendQuoteEmail({
                   <!-- Header & Logo -->
                   <tr>
                     <td align="left" valign="top" style="padding: 32px 32px 16px 32px;">
-                      ${
-                        logoUrl
-                          ? `<img src="${logoUrl}" alt="PriceRight" width="50" style="display: block; width: 50px; max-width: 100%; height: auto; border: 0; outline: none; text-decoration: none;" />`
-                          : `<span style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 20px; color: #1A1A1A; letter-spacing: -0.5px;">Price<span style="color: #1A1A1A; background-color: #FFC200; padding: 2px 6px; border-radius: 4px;">Right</span></span>`
+                      ${logoUrl
+                        ? `<img src="${logoUrl}" alt="PriceRight" width="50" style="display: block; width: 50px; max-width: 100%; height: auto; border: 0; outline: none; text-decoration: none;" />`
+                        : `<span style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 20px; color: #1A1A1A; letter-spacing: -0.5px;">Price<span style="color: #1A1A1A; background-color: #FFC200; padding: 2px 6px; border-radius: 4px;">Right</span></span>`
                       }
                     </td>
                   </tr>
@@ -95,7 +104,7 @@ export async function sendQuoteEmail({
                         </tr>
                       </table>
 
-                      <!-- Primary Action CTA (#FF4A3C) -->
+                      <!-- Primary Action CTA -->
                       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 28px;">
                         <tr>
                           <td align="center" valign="top">

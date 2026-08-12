@@ -27,7 +27,7 @@ export function QuoteView({ quote, children }: QuoteViewProps) {
       <div className="w-full rounded-xl dark:bg-ink border dark:border-ink-dark border-ink/10 shadow-sm p-6 sm:p-8 space-y-6">
         <div>
           <div className="flex flex-row w-full justify-between">
-            <p className="text-sm text-ink/60 dark:text-muted-foreground/60">Quote for</p>
+            <p className="text-sm text-ink/60 dark:text-muted-foreground">Quote for</p>
             <span title="Download Quote" className="cursor-pointer">
               <Link href={`/api/downloads/download-receipt/${quote.quoteId}`}
                 target="_blank" rel="noopener noreferrer">
@@ -35,19 +35,19 @@ export function QuoteView({ quote, children }: QuoteViewProps) {
               </Link>
             </span>
           </div>
-          <h1 className="font-heading max-w-[60%] text-2xl font-bold text-ink dark:text-muted-foreground">{quote.customerName}</h1>
+          <h1 className="font-heading max-w-[60%] text-2xl font-bold text-ink dark:text-white">{quote.customerName}</h1>
         </div>
 
-        <p className="text-ink/80  dark:text-muted-foreground">{quote.description}</p>
+        <p className="text-ink/80 wrap-break-word dark:text-muted-foreground">{quote.description}</p>
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t dark:border-ink-dark border-ink/10 pt-6">
           <div>
-            <p className="text-sm text-ink/60  dark:text-muted-foreground/60">Total price</p>
-            <p className="text-2xl font-bold tabular-nums text-ink  dark:text-muted-foreground">${quote.price.toFixed(2)}</p>
+            <p className="text-sm text-ink/60  dark:text-muted-foreground">Total price</p>
+            <p className="text-2xl font-bold tabular-nums text-ink  dark:text-white">${quote.price.toFixed(2)}</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-ink/60  dark:text-muted-foreground/60">Due date</p>
-            <p className="font-medium text-ink  dark:text-muted-foreground">{quote.dueDate}</p>
+            <p className="text-sm text-ink/60  dark:text-muted-foreground">Due date</p>
+            <p className="font-medium text-ink  dark:text-white">{quote.dueDate}</p>
           </div>
         </div>
 

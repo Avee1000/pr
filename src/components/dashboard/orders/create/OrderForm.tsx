@@ -57,8 +57,10 @@ export default function OrderForm({ customers, materials, laborCost, targetProfi
   ]);
   const [estimatedHours, setEstimatedHours] = useState("0");
   const [dueDate, setDueDate] = useState<Date | undefined>(new Date());
-  const [status, setStatus] = useState("quote_sent");
+  const [status, setStatus] = useState("in_progress");
   const [paymentStatus, setPaymentStatus] = useState("pending");
+  const [orderStatusValue, setOrderStatusValue] = useState("In Progress");
+  const [paymentStatusValue, setPaymentStatusValue] = useState("Pending");
 
   const materialById = useMemo(
     () => new Map(materials.map((material) => [material.id, material])),
@@ -115,8 +117,10 @@ export default function OrderForm({ customers, materials, laborCost, targetProfi
       setMaterialsUsed([{ material_cost_id: "", quantity: "1" }]);
       setEstimatedHours("0");
       setDueDate(undefined);
-      setStatus("quote_sent");
+      setStatus("in_progress");
       setPaymentStatus("pending");
+      setOrderStatusValue("In Progress");
+      setPaymentStatusValue("Pending");
       router.refresh();
     }
     return result;
@@ -154,9 +158,9 @@ export default function OrderForm({ customers, materials, laborCost, targetProfi
       prev.map((row, rowIndex) =>
         rowIndex === index
           ? {
-              ...row,
-              ...value,
-            }
+            ...row,
+            ...value,
+          }
           : row
       )
     );
@@ -401,7 +405,7 @@ export default function OrderForm({ customers, materials, laborCost, targetProfi
                   </SelectContent>
                 </Select>
               </div>
-                
+
               <div className="space-y-2">
                 <label className="text-xs font-semibold uppercase text-muted-foreground relative bottom-1.5 max-sm:block  max-sm:bottom-0">Quantity</label>
                 <Input
@@ -532,7 +536,16 @@ export default function OrderForm({ customers, materials, laborCost, targetProfi
               <Tag className="h-3.5 w-3.5" />
               Initial Status
             </label>
-            <Select value={status} onValueChange={(value) => setStatus(value as string)}>
+            <Select value={orderStatusValue}
+              onValueChange={(value) => {
+                if (!value) return;
+                const formattedStatus = value
+                  .split("_")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                  .join(" ");
+                setOrderStatusValue(formattedStatus);
+                setStatus(value as string)
+              }}>
               <SelectTrigger className="h-12 w-full rounded-xl border-border bg-white pl-3.5 text-sm shadow-xs transition-all hover:bg-muted/50 focus:border-ring focus:ring-2 focus:ring-ring/20">
                 <SelectValue placeholder="Select status..." />
               </SelectTrigger>
@@ -553,7 +566,15 @@ export default function OrderForm({ customers, materials, laborCost, targetProfi
               <CreditCard className="h-3.5 w-3.5" />
               Payment Status
             </label>
-            <Select value={paymentStatus} onValueChange={(paymentStatus) => setPaymentStatus(paymentStatus as string)}>
+            <Select value={paymentStatusValue}
+              onValueChange={(paymentStatus) => {
+                if (!paymentStatus) return;
+                const formattedStatus = paymentStatus
+                  .split("_").map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                  .join(" ");
+                setPaymentStatusValue(formattedStatus);
+                setPaymentStatus(paymentStatus as string)
+              }}>
               <SelectTrigger className="h-12 w-full rounded-xl border-border bg-white pl-3.5 text-sm shadow-xs transition-all hover:bg-muted/50 focus:border-ring focus:ring-2 focus:ring-ring/20">
                 <SelectValue placeholder={"Select payment status..."} />
               </SelectTrigger>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { createColumnHelper } from "@tanstack/react-table"
-import { ArrowUpDown, Edit2 } from "lucide-react"
+import { ChevronsUpDown, Edit2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Customer } from '@/lib/supabase/types'
 import Delete from '../edit/DeleteCustomer'
@@ -21,7 +21,7 @@ export const columns = columnHelper.columns([
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
         Name
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        <ChevronsUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ row }) => (
@@ -42,7 +42,7 @@ export const columns = columnHelper.columns([
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
         Country
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        <ChevronsUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ row }) => (
@@ -61,7 +61,7 @@ export const columns = columnHelper.columns([
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
         Date Created
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        <ChevronsUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ row }) => (

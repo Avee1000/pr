@@ -61,7 +61,7 @@ export default function OrderNavLinks() {
     return (
         <aside
             className={`h-auto transition-[width] duration-300 ease-in-out select-none pt-1 pl-1 pb-1  ${
-                isOpen ? "sm:w-54 lg:w-64" : "w-16"
+                isOpen ? "sm:w-50 lg:w-64" : "w-16"
             }`}
         >
             <section
@@ -140,7 +140,7 @@ export default function OrderNavLinks() {
                                             <ParentIcon className="size-5" />
                                         </div>
                                         <div
-                                            className={`pl-8 transition-opacity duration-200 whitespace-nowrap text-sm ${
+                                            className={`pl-8 min-w-0 text-ellipsis truncate transition-opacity duration-200 whitespace-nowrap sm:text-xs lg:text-sm ${
                                                 isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                                             }`}
                                         >

@@ -1,15 +1,17 @@
 'use client'
 
-import { useState, useEffect, Suspense, use } from 'react';
+import { useState, useEffect, Suspense, use, useMemo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Filter from '@/components/Filter';
-import { Loader, RefreshCw, Columns } from 'lucide-react';
-import { OrderRowsProps } from '@/lib/supabase/types';
+import { Loader } from 'lucide-react';
+import { OrderRowsProps, Customer } from '@/lib/supabase/types';
 import { toast } from 'sonner'
 import Loading from '@/components/AnimateSpin';
-import OrderRows from './OrderRows';
-import useMediaQuery from '@/components/useMediaQuery';
 import ViewSingleOrder from './ViewSingleOrder';
+import { OrderState, updateOrder } from '@/lib/orders/action';
+import { selectAllCustomers } from '@/lib/customers/action';
+import { DataTable } from '@/components/dashboard/orders/edit/data-table';
+import { getColumns, EditFormState } from './columns';
 
 export const FilterList = [
     {
@@ -31,16 +33,15 @@ export const FilterList = [
     }
 ];
 
-export default function ViewOrders({ ordersPromise, onDelete, }: {
+
+export default function ViewOrdersPage({ ordersPromise, }: {
     ordersPromise: Promise<OrderRowsProps[]>;
-    onDelete?: () => void;
 }) {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [searchQuery, setSearchQuery] = useState('');
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [statusFilterValue, seStatusFilterValue] = useState('all');
-    const [paymentFilterValue, setPaymentFilterValue] = useState('all');
+    const statusFilterValue = searchParams.get('status') || 'all';
+    const paymentFilterValue = searchParams.get('payment_status') || 'all';
 
     const handleRefresh = async () => {
         setIsRefreshing(true);
@@ -55,165 +56,197 @@ export default function ViewOrders({ ordersPromise, onDelete, }: {
             })
         }
     }, [isRefreshing])
-    // const handleNavigation = () => {
-    //     router.push('/dashboard/orders');
-    // };
-
-    // const handleDelete = (id: string) => {
-    //     setOrders(orders.filter(order => order.id !== id));
-    // };
-
-    // const filteredOrders = orders.filter(order =>
-    //     order.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    //     order.description.toLowerCase().includes(searchQuery.toLowerCase())
-    // );
-
-    useEffect(() => {
-        const params = new URLSearchParams(searchParams.toString());
-        if (params.has('status') || params.has('payment_status')) {
-            seStatusFilterValue(params.get('status') || 'all');
-            setPaymentFilterValue(params.get('payment_status') || 'all');
-        } else {
-            seStatusFilterValue('all');
-            setPaymentFilterValue('all');
-        }
-    }, [searchParams])
 
     return (
         <main className="">
-            {/* Top Control Bar: Search & Refresh — renders immediately, never suspends */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-between items-center rounded-lg mb-6 shadow-md/20 p-4 w-full box-border dark:bg-muted">
-                <div id="searchBoxContainer" className="w-full sm:flex-1 sm:max-w-[50%]">
-                    <div className="searchContainer flex items-center justify-between gap-2 h-9 w-full">
-                        <input
-                            type="search"
-                            id="search"
-                            name="q"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search by name, country, or date..."
-                            className="dark:bg-ink w-full h-full text-xs rounded-lg border outline-none px-3 placeholder:opacity-40 focus:border-brand focus:ring-2 focus:ring-brand/20 shadow-sm"
-                        />
+            {/* <div className="rounded-lg mb-6 shadow-md/20 p-4 w-full box-border dark:bg-muted">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="space-y-1">
+                        <h2 className="text-xl font-semibold">Orders</h2>
+                        <p className="text-sm text-muted-foreground max-w-2xl">
+                            Review active client orders, monitor pricing adjustments, and update payment status from one place.
+                        </p>
                     </div>
                 </div>
-                <button
-                    onClick={handleRefresh}
-                    disabled={isRefreshing}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-ink/20 bg-white hover:bg-ink/5 dark:bg-muted dark:border-muted-foreground text-sm font-medium disabled:opacity-50"
-                >
-                    <RefreshCw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                    <span>Refresh</span>
-                </button>
-            </div>
-            {/* Filter Component Section */}
-            <div className="bg-muted shadow-md/20 rounded-lg w-full mb-6 p-2 box-border">
+            </div> */}
+
+            <div className="shadow-md/20 rounded-lg w-full mb-6 p-2 box-border">
                 <Filter filters={FilterList} />
             </div>
 
             <Suspense fallback={<Loading />}>
-                <OrdersTable ordersPromise={ordersPromise} searchQuery={searchQuery} onDelete={() => onDelete} statusFilterValue={statusFilterValue} paymentFilterValue={paymentFilterValue} />
+                <ViewOrders
+                    ordersPromise={ordersPromise}
+                    statusFilterValue={statusFilterValue}
+                    paymentFilterValue={paymentFilterValue}
+                    onRefresh={handleRefresh}
+                    isRefreshing={isRefreshing}
+                />
             </Suspense>
         </main >
     );
 }
 
-function OrdersTable({ ordersPromise, searchQuery, statusFilterValue, paymentFilterValue, onDelete }: {
+function ViewOrders({ ordersPromise, statusFilterValue, paymentFilterValue, onRefresh, isRefreshing }: {
     ordersPromise: Promise<OrderRowsProps[]>;
-    searchQuery: string;
     statusFilterValue: string | undefined;
     paymentFilterValue: string | undefined;
-    onDelete?: (orderId: string) => void;
+    onRefresh?: () => void;
+    isRefreshing?: boolean;
 }) {
     const orders = use(ordersPromise);
-    const [selectedOrder, setSelectedOrder] = useState<OrderRowsProps | null>(null);
-    const [visibleColumns, setVisibleColumns] = useState({
-        customer: true,
-        description: true,
-        price: true,
-        dueDate: true,
-        status: true,
-        paymentStatus: true,
-        actions: true,
-        createdAt: true,
+    const [selectedOrder, setSelectedOrder] = useState<OrderRowsProps | null>(null)
+
+    const statusFilter = statusFilterValue?.trim().toLowerCase();
+    const paymentFilter = paymentFilterValue?.trim().toLowerCase();
+
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [customerOpen, setCustomerOpen] = useState(false);
+    const [customerId, setCustomerId] = useState("");
+    const [allCustomers, setAllCustomers] = useState<Customer[] | null>(null);
+    const initialState: OrderState = { message: null, errors: {} };
+
+    const [editForm, setEditForm] = useState<EditFormState>({
+        customerName: '',
+        description: '',
+        price: '',
+        status: '',
+        paymentStatus: '',
     });
-    const isMobile = useMediaQuery('(max-width: 768px)');
+
+    const selectedCustomer = useMemo(() => allCustomers?.find((c) => c.id === customerId), [allCustomers, customerId]);
 
     useEffect(() => {
-        if (isMobile) {
-            setVisibleColumns((prev) => ({
-                ...prev,
-                description: false,
-                dueDate: false,
-                createdAt: false,
-                // Keep actions visible so Share / Edit / Delete work on mobile.
-                actions: true,
-            }));
-        }
-    }, [isMobile]);
+        const fetchCustomers = async () => {
+            const data = await selectAllCustomers();
+            setAllCustomers(data);
+        };
+        fetchCustomers();
+    }, []);
 
-    const toggleColumn = (column: keyof typeof visibleColumns) => {
-        setVisibleColumns((prev) => ({ ...prev, [column]: !prev[column] }));
-    };
+    const handleEditClick = useCallback((order: OrderRowsProps) => {
+        setEditingId(order.allOrders.id);
+        setCustomerId(order.customer?.id || "");
+        setEditForm({
+            customerName: order.customer?.name || '',
+            description: order.allOrders.description || '',
+            price: order.allOrders.price?.toString() || '',
+            status: order.allOrders.status || '',
+            paymentStatus: order.allOrders.payment_status || '',
+        });
+    }, []);
+
+    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setEditForm((prev) => ({ ...prev, [name]: value }));
+    }, []);
+
+    const handleSelectChange = useCallback((field: string, value: string | null) => {
+        setEditForm((prev) => ({ ...prev, [field]: value ?? '' }));
+    }, []);
+
+    const handleSave = useCallback(async (id: string, initialCustomerId: string) => {
+        const formData = new FormData();
+        formData.append('description', editForm.description);
+        formData.append('price', editForm.price);
+        formData.append('status', editForm.status);
+        formData.append('payment_status', editForm.paymentStatus);
+
+        const targetCustomerId = customerId || initialCustomerId;
+        formData.append('customer_id', targetCustomerId);
+        formData.append('due_date', " ");
+        const toastId = toast.loading("Updating order...");
+
+        try {
+            const result = await updateOrder(id, initialState, formData);
+
+            if (result?.success) {
+                toast.success("Order updated successfully!", { id: toastId });
+                setEditingId(null);
+                setCustomerId("");
+            } else {
+                console.error("Validation Errors:", result?.errors);
+                const errorContent = (
+                    <div>
+                        <p className="font-semibold">{result?.message || "Failed to update order."}</p>
+                        {result?.errors && (
+                            <ul className="list-disc pl-4 mt-1 text-sm">
+                                {Object.values(result.errors)
+                                    .flat()
+                                    .map((err, index) => (
+                                        <li key={index}>{err}</li>
+                                    ))}
+                            </ul>
+                        )}
+                    </div>
+                );
+                toast.error(errorContent, { id: toastId });
+            }
+        } catch (error) {
+            console.error("Unexpected error:", error);
+            toast.error("An unexpected error occurred.", { id: toastId });
+        }
+    }, [editForm, customerId]);
+
+    const filtered = useMemo(() => orders.filter((item) => {
+        const order = item.allOrders;
+
+        const matchesStatus = statusFilter === 'all' || (order.status && order.status.toLowerCase() === statusFilter);
+        const matchesPayment = paymentFilter === 'all' || (order.payment_status && order.payment_status.toLowerCase() === paymentFilter);
+
+        return matchesStatus && matchesPayment;
+    }), [orders, statusFilter, paymentFilter]);
+
+    const columns = useMemo(() => getColumns({
+        editingId,
+        setEditingId,
+        editForm,
+        handleChange,
+        handleSelectChange,
+        customerOpen,
+        setCustomerOpen,
+        customerId,
+        setCustomerId,
+        allCustomers,
+        handleSave,
+        setSelectedOrder,
+        handleEditClick,
+        selectedCustomer,
+    }), [editingId, editForm, customerOpen, customerId, allCustomers, handleSave, handleEditClick, selectedCustomer, handleChange, handleSelectChange]);
+
+    const globalFilterFn = useCallback((row: any, _columnId: any, filterValue: any) => {
+        const query = String(filterValue ?? "").toLowerCase().trim()
+        if (!query) return true
+
+        const item = row.original
+        const order = item.allOrders
+        const dateString = order.created_at
+            ? new Date(order.created_at).toLocaleDateString('en-US')
+            : ''
+
+        return (
+            order.description?.toLowerCase().includes(query) ||
+            order.status?.toLowerCase().includes(query) ||
+            dateString.toLowerCase().includes(query) ||
+            item.customer.name?.toLowerCase().includes(query)
+        )
+    }, []);
 
     return (
-        <div className="rounded-xl border border-ink/10 shadow-sm box-border flex flex-col">
-            {/* Columns Toggle Bar - separated from overflow-hidden container */}
-            <div className="p-3 border-b border-ink/10 dark:border dark:rounded-t-xl dark:border-muted-foreground relative">
-                <details className="relative inline-block text-left">
-                    <summary className="cursor-pointer inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white dark:bg-muted shadow-sm px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand">
-                        <Columns className='size-4' /> Columns
-                    </summary>
-                    <div className="absolute left-0 mt-2 w-56 rounded-md shadow-xl bg-white dark:bg-ink ring-1 ring-black ring-opacity-5 z-30 max-h-60 overflow-y-auto scrollbar-thin">
-                        <div className="py-1" role="menu">
-                            {Object.keys(visibleColumns).map((column) => (
-                                <label key={column} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-muted cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        className="mr-2 rounded border-gray-300 text-brand focus:ring-brand"
-                                        checked={visibleColumns[column as keyof typeof visibleColumns]}
-                                        onChange={() => toggleColumn(column as keyof typeof visibleColumns)}
-                                    />
-                                    {column.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                </details>
-            </div>
-
-            {/* Scrollable Table Container */}
-            <div className="max-h-170 overflow-y-auto overflow-x-auto scroll-fade-x scrollbar-thin scroll-smooth">
-                <table className="w-full text-left border-collapse text-sm table-auto">
-                    <thead className="sticky top-0 z-10">
-                        <tr className="border-b border-ink/10 dark:bg-muted dark:text-gray-400 bg-ink/5 font-semibold">
-                            {visibleColumns.customer && <th className="p-3">Customer</th>}
-                            {visibleColumns.description && <th className="p-3 md:table-cell truncate">Description</th>}
-                            {visibleColumns.price && <th className="p-3 sm:table-cell truncate">Price</th>}
-                            {visibleColumns.dueDate && <th className="p-3 truncate">Due Date</th>}
-                            {visibleColumns.status && <th className="p-3">Status</th>}
-                            {visibleColumns.paymentStatus && <th className="p-3 truncate">Payment Status</th>}
-                            {visibleColumns.createdAt && <th className="p-3 text-left truncate">Date Created</th>}
-                            {visibleColumns.actions && <th className="p-3 text-right">Actions</th>}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-ink/10 truncate">
-                        <OrderRows
-                            orders={orders}
-                            searchQuery={searchQuery}
-                            visibleColumns={visibleColumns}
-                            statusFilterValue={statusFilterValue}
-                            paymentFilterValue={paymentFilterValue}
-                            onViewOrder={(order) => setSelectedOrder(order)}
-                        />
-                    </tbody>
-                </table>
-            </div>
-            {/* ViewSingleOrder Drawer rendered at top-level outside the table container */}
+        <>
+            <DataTable
+                columns={columns}
+                data={filtered}
+                globalFilterFn={globalFilterFn}
+                initialColumnPinning={{ start: [], end: ['actions'] }}
+                onRefresh={onRefresh}
+                isRefreshing={isRefreshing}
+            />
             <ViewSingleOrder
                 orderData={selectedOrder}
                 isOpen={!!selectedOrder}
                 onClose={() => setSelectedOrder(null)}
             />
-        </div>
+        </>
     )
 }
