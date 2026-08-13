@@ -14,6 +14,8 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import Image from "next/image";
+import ThemeToggleIcon from "@/components/ThemeIconButton";
 
 const initialState: AuthFormState = {};
 
@@ -22,7 +24,23 @@ export default function LoginPage() {
   const [state, formAction] = useActionState(signIn, initialState);
 
   return (
-    <main className="mx-auto min-h-screen flex w-full max-w-md flex-1 flex-col justify-center px-4 py-12">
+    <main className="mx-auto sm:min-h-screen max-sm:h-dvh flex w-full max-w-md flex-1 flex-col justify-center px-4 sm:py-12">
+      <div className="absolute top-0 left-0 m-4">
+        <Link href="/" className="flex items-center gap-1 text-lg font-semibold text-ink dark:text-white">
+          <Image
+            src="/android-chrome-512x512.png"
+            width={32}
+            height={32}
+            className="h-8 w-8 object-contain"
+            priority
+            alt="PriceRight Logo"
+          />
+          PriceRight
+        </Link>
+      </div>
+      <div className="absolute top-0 right-0 m-4">
+        <ThemeToggleIcon />
+      </div>
       <Card>
         <CardHeader>
           <CardTitle className="font-heading text-2xl font-bold">Welcome back</CardTitle>

@@ -36,6 +36,7 @@ export default function RootLayout({
         "h-full",
         "antialiased",
         "font-sans",
+        "max-sm:text-[calc(var(--text-xs)+1.5px)]!",
         inter.variable,
         poppins.variable,
       )}
