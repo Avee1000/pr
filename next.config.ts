@@ -10,3 +10,5 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// "dev": "concurrently \"next dev\" \"npm --prefix server run dev\"",

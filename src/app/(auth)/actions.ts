@@ -4,15 +4,18 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from 'next/headers';
+import { getClientCountry } from "@/lib/geo/geo";
 
 export interface AuthFormState {
   error?: string;
+  message?: string;
 }
 
 export async function signUp(
   _prevState: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
@@ -24,15 +27,24 @@ export async function signUp(
     return { error: "Password must be at least 6 characters long." };
   }
 
+  const country = await getClientCountry();
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { name } },
+    options: {
+      data: {
+        name,
+        country,
+      },
+    },
   });
 
   if (error) {
     return { error: error.message };
+  }
+  if (!data.session) {
+    return { message: "Please check your email to confirm your account." };
   }
 
   revalidatePath("/", "layout");

@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCashFlowSummary } from "@/lib/dashboard/cashflow";
+import { FormattedPrice } from "@/components/context/FormattedPrice"; // 👈 Import the Client Leaf
 
 export default async function CashFlowSummary() {
   const summary = await getCashFlowSummary();
@@ -21,9 +22,8 @@ export default async function CashFlowSummary() {
           <CardTitle>Revenue this month</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold tabular-nums text-ink dark:text-white">
-            ${summary.monthlyRevenue.toFixed(2)}
-          </p>
+          {/* Replace hardcoded $ with FormattedPrice */}
+          <FormattedPrice className="text-2xl font-bold tabular-nums text-ink dark:text-white" amountInUSD={summary.monthlyRevenue} />
           <p className="text-sm text-muted-foreground">From orders paid this month.</p>
         </CardContent>
       </Card>
@@ -33,9 +33,8 @@ export default async function CashFlowSummary() {
           <CardTitle>Receivables</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold tabular-nums text-ink dark:text-white">
-            ${summary.receivablesTotal.toFixed(2)}
-          </p>
+          {/* Replace hardcoded $ with FormattedPrice */}
+          <FormattedPrice className="text-2xl font-bold tabular-nums text-ink dark:text-white" amountInUSD={summary.receivablesTotal} />
           <p className="text-sm text-muted-foreground">
             {summary.receivablesCount === 0
               ? "Nothing pending right now."
@@ -49,13 +48,9 @@ export default async function CashFlowSummary() {
           <CardTitle>Overdue payments</CardTitle>
         </CardHeader>
         <CardContent>
-          <p
-            className={`text-2xl font-bold tabular-nums ${
-              summary.overdueCount > 0 ? "text-red-600 dark:text-red-400" : "text-ink dark:text-white"
-            }`}
-          >
-            ${summary.overdueTotal.toFixed(2)}
-          </p>
+          {/* Replace hardcoded $ with FormattedPrice */}
+          <FormattedPrice className={`text-2xl font-bold tabular-nums ${summary.overdueCount > 0 ? "text-red-600 dark:text-red-400" : "text-ink dark:text-white"
+            }`} amountInUSD={summary.overdueTotal} />
           <p className="text-sm text-muted-foreground">
             {summary.overdueCount === 0
               ? "No overdue payments."

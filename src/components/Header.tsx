@@ -6,8 +6,9 @@ import ThemeToggleIcon from "./ThemeIconButton";
 import IsMobileOrderNavLinks from "./dashboard/IsMobileDashboardNavigation";
 import NotificationIcon from "./notifications/NotificationIcon";
 import MobileHideWrapper from "./MobileHideWrapper";
-// Server component: reads the auth session so the header can show a sign-out
-// button for signed-in users, or a sign-in link for visitors.
+import { ReceiptText } from "lucide-react";
+
+
 export default async function Header() {
   const supabase = await createClient();
   const {
@@ -33,8 +34,12 @@ export default async function Header() {
             />
             PriceRight
           </Link>
-          <div className="flex flex-row justify-center items-center gap-3">
-            {!user ? <ThemeToggleIcon /> : <NotificationIcon />}
+          <div className="flex flex-row justify-center items-center gap-2">
+            <div className="flex flex-row justify-center items-center gap-1">
+              {user && <Link title="Orders" className="flex justify-center items-center size-8 border border-muted-foreground/50 rounded-full hover:bg-gray-100 hover:border-ink dark:hover:border-muted-foreground dark:hover:bg-neutral-800 transition-colors focus:outline-none focus-visible:ring-2 " href="/dashboard/orders"><ReceiptText strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"className="size-4 text-gray-700 dark:text-gray-200"/>
+              </Link>}
+              {!user ? <ThemeToggleIcon /> : <NotificationIcon />}
+            </div>
             <AuthHeaderActions isSignedIn={!!user} user={user} />
           </div>
         </div>

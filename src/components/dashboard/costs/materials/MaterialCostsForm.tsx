@@ -11,11 +11,13 @@ import { SubmitButton } from "@/components/SubmitButton";
 import { createMaterialsBatch, type MaterialState, updateMaterial, deleteMaterial } from "@/lib/costs/action";
 import type { Material } from "@/lib/supabase/types";
 import Delete from "./DeleteMaterial";
+import { useCurrency } from "@/components/context/currencyContext";
+import Information from "@/components/Information";
 
 type MaterialDraft = {
   name: string;
   unit: string;
-  value: string;
+  value: string | number;
 };
 
 const initialDraft: MaterialDraft = {
@@ -28,6 +30,11 @@ const initialState: MaterialState = {};
 
 function MaterialEditRow({ material }: { material: Material }) {
   const [state, formAction] = useActionState(updateMaterial.bind(null, material.id), initialState);
+  const { currencySymbol, rates, currency, loading } = useCurrency();
+
+  // 1. Calculate the raw numeric value in the active currency (no symbols/commas)
+  const rate = rates[currency] || 1;
+  const convertedNumericValue = (Number(material.value) * rate).toFixed(2);
 
   useEffect(() => {
     if (state?.success) {
@@ -43,30 +50,39 @@ function MaterialEditRow({ material }: { material: Material }) {
         <Label htmlFor={`name-${material.id}`}>Name</Label>
         <Input id={`name-${material.id}`} name="name" defaultValue={material.name} required className="rounded-xl" />
       </div>
+
       <div className="flex flex-col gap-2">
         <Label htmlFor={`unit-${material.id}`}>Unit</Label>
         <Input id={`unit-${material.id}`} name="unit" defaultValue={material.unit} required className="rounded-xl" />
       </div>
+
       <div className="flex flex-col gap-2">
-        <Label htmlFor={`value-${material.id}`}>Value</Label>
-        <Input
-          id={`value-${material.id}`}
-          name="value"
-          type="number"
-          step="0.01"
-          min="0.01"
-          defaultValue={material.value}
-          required
-          className="rounded-xl"
-        />
+        <Label htmlFor={`value-${material.id}`}>Value ({currencySymbol})</Label>
+        {/* 2. Visual Currency Symbol Prefix */}
+        <div className="relative flex items-center">
+          {/* <span className="absolute left-4 text-muted-foreground text-sm font-medium select-none">
+            {currencySymbol}
+          </span> */}
+          <Input
+            id={`value-${material.id}`}
+            name="value"
+            type="number"
+            step="0.01"
+            min="0.01"
+            defaultValue={loading ? material.value : convertedNumericValue}
+            required
+            className="rounded-xl"
+          />
+        </div>
       </div>
-      <div className="flex items-end">
+
+      <div className="flex items-end gap-2">
         <SubmitButton
           label="Update"
           Icon={Pencil}
           className="bg-action hover:bg-action rounded-xl h-10 px-4 text-white w-full md:w-auto"
         />
-      <Delete id={material.id}/>
+        <Delete id={material.id} />
       </div>
 
       {(state.errors?.name || state.errors?.unit || state.errors?.value) && (
@@ -80,6 +96,8 @@ function MaterialEditRow({ material }: { material: Material }) {
 
 export default function MaterialCostsForm({ materials }: { materials: Material[] }) {
   const [items, setItems] = useState<MaterialDraft[]>([initialDraft]);
+  const { currencySymbol, rates, currency, loading } = useCurrency();
+  const rate = rates[currency] || 1;
   const [state, formAction] = useActionState(
     async (prevState: MaterialState, formData: FormData) => {
       const result = await createMaterialsBatch(prevState, formData);
@@ -95,14 +113,19 @@ export default function MaterialCostsForm({ materials }: { materials: Material[]
     () =>
       JSON.stringify(
         items
-          .map((item) => ({
-            name: item.name.trim(),
-            unit: item.unit.trim(),
-            value: item.value,
-          }))
+          .map((item) => {
+            const rawLocalValue = Number(item.value) || 0;
+            const usdValue = rate > 0 ? Number((rawLocalValue / rate).toFixed(2)) : rawLocalValue;
+
+            return {
+              name: item.name.trim(),
+              unit: item.unit.trim(),
+              value: usdValue, 
+            };
+          })
           .filter((item) => item.name || item.unit || item.value)
       ),
-    [items]
+    [items, rate]
   );
 
   useEffect(() => {
@@ -129,7 +152,7 @@ export default function MaterialCostsForm({ materials }: { materials: Material[]
     <div className="flex flex-col gap-8">
       <Card className="p-6 w-full">
         <CardHeader>
-          <CardTitle className="font-heading text-2xl font-bold">Material Costs</CardTitle>
+          <CardTitle className="font-heading text-2xl font-bold">Material Costs <Information detail="Input the the material value in your preferred local currency" /></CardTitle>
           <CardDescription>Add your materials with name, unit, and cost value.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -163,7 +186,7 @@ export default function MaterialCostsForm({ materials }: { materials: Material[]
                       />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <Label htmlFor={`draft-value-${index}`}>Value</Label>
+                      <Label htmlFor={`draft-value-${index}`}>Value ({currencySymbol})</Label>
                       <Input
                         id={`draft-value-${index}`}
                         placeholder="0.00"

@@ -46,7 +46,7 @@ export default function OrderNavLinks() {
     const pathname = usePathname();
     const isMobile = useMediaQuery('(max-width: 768px)');
     const [isCostsOpen, setIsCostsOpen] = useState(false);
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
         if (pathname.startsWith('/dashboard/costs')) {

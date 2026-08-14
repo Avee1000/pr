@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils"
 import { Edit2, Check, X, ChevronsUpDown, LucideInfo } from "lucide-react"
 import { orderStatusColors, paymentStatusColors } from "@/lib/supabase/types"
 import { DataTableFeatures } from "@/components/dashboard/orders/edit/data-table"
+import { FormattedPrice } from "@/components/context/FormattedPrice"
 
 const columnHelper = createColumnHelper<DataTableFeatures, OrderRowsProps>()
 
@@ -213,7 +214,8 @@ export const getColumns = ({
                         />
                     )
                 }
-                return `$${Number(info.getValue()).toFixed(2)}`
+                return <FormattedPrice amountInUSD={info.getValue().toFixed(2)} />
+
             },
             size: 120,
             minSize: 80,

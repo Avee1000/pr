@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   QueryClient,
   QueryClientProvider,
@@ -9,6 +9,7 @@ import {
   useQueryClient,
   keepPreviousData,
 } from '@tanstack/react-query';
+import { fetchUserLocation } from '@/lib/geo/geo';
 
 // --- API / Fetcher Functions ---
 async function fetchPosts(page: number) {
@@ -125,10 +126,21 @@ function PostsManager() {
 // --- Main Page Component (Wraps Provider locally to avoid missing context errors) ---
 export default function Page() {
   const [queryClient] = useState(() => new QueryClient());
+  const [userLocation, setUserLocation] = useState(null);
 
+  // 2. Safely call the async Server Action inside useEffect
+  useEffect(() => {
+    async function getUser() {
+      const data = await fetchUserLocation();
+      console.log('User Location:', data);
+      setUserLocation(data);
+    }
+    getUser();
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <PostsManager />
     </QueryClientProvider>
   );
 }
+

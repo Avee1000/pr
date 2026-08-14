@@ -88,17 +88,17 @@ export default function NotificationIcon() {
     <>
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="relative p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-action"
+        className="relative flex justify-center items-center p-1.5 size-8 border border-muted-foreground/50 rounded-full hover:bg-gray-100 hover:border-ink dark:hover:border-muted-foreground dark:hover:bg-neutral-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-action"
         aria-label="Toggle Notifications"
         aria-expanded={isOpen}
         aria-controls="notification-drawer"
       >
-        <Bell strokeWidth={1.5} className="size-5 text-gray-700 dark:text-gray-200" />
+        <Bell strokeWidth={1.5} className="size-4 text-gray-700 dark:text-gray-200" />
 
         {hasNotifications && (
-          <span className="absolute top-0 right-1 flex size-2.5">
+          <span className="absolute top-1 right-2 flex size-1.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-action opacity-75" />
-            <span className="relative inline-flex size-2.5 rounded-full bg-action" />
+            <span className="relative inline-flex size-1.5 rounded-full bg-action" />
           </span>
         )}
       </button>

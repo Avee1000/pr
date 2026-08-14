@@ -136,16 +136,11 @@ ALTER TABLE quotes
 
 
   //////////////////////////////////////////////////////////////
-  CREATE OR REPLACE FUNCTION get_allinfo_by_id(p_order_id uuid)
+CREATE OR REPLACE FUNCTION get_allinfo_by_share_token(p_share_token text)
 RETURNS TABLE (
     quote_status text,
     share_token text,
     approved_at timestamptz,
-    order_description text,
-    order_id uuid,
-    quote_id uuid,
-    order_price numeric,
-    order_due_date date,
     order_status text,
     customer_name text,
     customer_email text,
@@ -163,11 +158,6 @@ BEGIN
     q.status::text AS quote_status,
     q.share_token,
     q.approved_at,
-    o.description AS order_description,
-    o.id AS order_id,
-    q.id AS quote_id,
-    o.price AS order_price,
-    o.due_date AS order_due_date,
     o.status::text AS order_status,
     c.name AS customer_name,
     c.email AS customer_email,
@@ -175,13 +165,14 @@ BEGIN
   FROM quotes q
   JOIN orders o ON o.id = q.order_id
   JOIN customers c ON c.id = o.customer_id
-  WHERE o.id = p_order_id
+  WHERE q.share_token = p_share_token
   LIMIT 1;
 END;
 $$;
 
 
-GRANT EXECUTE ON FUNCTION get_allinfo_by_id(uuid) TO authenticated;
-GRANT EXECUTE ON FUNCTION get_allinfo_by_id(uuid) TO service_role;
+GRANT EXECUTE ON FUNCTION get_allinfo_by_share_token(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION get_allinfo_by_share_token(uuid) TO service_role;
 
 DROP FUNCTION IF EXISTS public.get_allinfo_by_id(uuid);
+

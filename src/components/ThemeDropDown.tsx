@@ -26,9 +26,9 @@ export default function ThemeToggleDropDown({ className }: { className?: string 
                 type="button"
                 onClick={() => setTheme('dark')}
                 className={cn(
-                    "flex items-center gap-2 w-full px-3 py-2 rounded-md text-xs transition-colors text-left",
-                    "hover:bg-gray-200 dark:hover:bg-gray-800",
-                    theme === 'dark' && "bg-gray-200 dark:bg-gray-800 font-medium"
+                    "flex items-center  gap-2 w-full px-3 py-2 rounded-md text-xs transition-colors text-left",
+                    "hover:bg-gray-200 dark:hover:bg-muted",
+                    theme === 'dark' && "bg-gray-200 dark:bg-muted font-medium"
                 )}
                 aria-label="Switch to dark theme"
             >
@@ -41,8 +41,8 @@ export default function ThemeToggleDropDown({ className }: { className?: string 
                 onClick={() => setTheme('light')}
                 className={cn(
                     "flex items-center gap-2 w-full px-3 py-2 rounded-md text-xs transition-colors text-left",
-                    "hover:bg-gray-200 dark:hover:bg-gray-800",
-                    theme === 'light' && "bg-gray-200 dark:bg-gray-800 font-medium"
+                    "hover:bg-gray-200 dark:hover:bg-muted",
+                    theme === 'light' && "bg-gray-200 dark:bg-muted font-medium"
                 )}
                 aria-label="Switch to light theme"
             >

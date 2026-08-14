@@ -15,7 +15,7 @@ import { createOrder, OrderState } from "@/lib/orders/action";
 import { Calendar } from "@/components/ui/calendar"
 import { format } from 'date-fns'
 import type { LaborCost, Material, TargetProfit } from "@/lib/supabase/types";
-
+import { FormattedPrice } from "@/components/context/FormattedPrice";
 
 interface Customer {
   id: string;
@@ -397,7 +397,7 @@ export default function OrderForm({ customers, materials, laborCost, targetProfi
                         <SelectItem key={material.id} value={material.id} className="cursor-pointer">
                           <div className="flex flex-col">
                             <span className="font-medium">{material.name}</span>
-                            <span className="text-xs text-muted-foreground">{material.unit} • ${material.value}</span>
+                            <span className="text-xs text-muted-foreground">{material.unit} • {<FormattedPrice amountInUSD={material.value} />}</span>
                           </div>
                         </SelectItem>
                       ))
