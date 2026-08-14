@@ -1,7 +1,7 @@
 import OrdersPage from "@/components/dashboard/orders/edit/ViewPage";
 import Link from "next/link";
 import { GripVertical } from "lucide-react";
-import Information from "@/components/Information";
+import Information from "@/components/global/Information";
 
 export default function OrderPage() {
   return (

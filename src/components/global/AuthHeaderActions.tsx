@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 // import { signOut } from "@/app/(auth)/actions";
-import UserMenu from "./profile/UserMenu";
+import UserMenu from "../profile/UserMenu";
 
 
 export function AuthHeaderActions({ isSignedIn, user }: { isSignedIn: boolean; user: any }) {

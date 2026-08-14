@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Customer } from '@/lib/supabase/types'
 import Delete from '../edit/DeleteCustomer'
 import { type DataTableFeatures } from "./data-table-features"
-import { KebabMenu } from '@/components/KebabMenu'
+import { KebabMenu } from '@/components/global/KebabMenu'
 
 const columnHelper = createColumnHelper<DataTableFeatures, Customer>()
 

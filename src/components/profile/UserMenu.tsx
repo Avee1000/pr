@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { SignOutButton } from '../accounts/SignOutButton'
-import Name from '../Names'
-import ThemeToggleDropDown from "../ThemeDropDown"
+import Name from '../global/Names'
+import ThemeToggleDropDown from "../global/ThemeDropDown"
 import CurrencySelector from './CurrencySelector' // <--- 1. Import Here
 
 export default function UserMenu({ user, children }: { user: any; children?: React.ReactNode }) {

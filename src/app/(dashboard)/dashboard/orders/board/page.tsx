@@ -2,7 +2,7 @@ import Link from "next/link";
 import OrderBoard, { BoardCard } from "@/components/dashboard/orders/board/OrderBoard";
 import { selectAllOrders } from "@/lib/orders/action";
 import { OrderStatus, PaymentStatus } from "@/lib/supabase/types";
-import Information from "@/components/Information";
+import Information from "@/components/global/Information";
 
 export default async function OrderBoardPage() {
   const orders = await selectAllOrders();

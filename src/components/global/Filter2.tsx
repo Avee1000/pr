@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Select,  } from "./ui/select";
+import { Select,  } from "../ui/select";
 
 interface FilterOption {
     value: string;

@@ -3,8 +3,8 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { AuthHeaderActions } from "./AuthHeaderActions";
 import ThemeToggleIcon from "./ThemeIconButton";
-import IsMobileOrderNavLinks from "./dashboard/IsMobileDashboardNavigation";
-import NotificationIcon from "./notifications/NotificationIcon";
+import IsMobileOrderNavLinks from "../dashboard/IsMobileDashboardNavigation";
+import NotificationIcon from "../notifications/NotificationIcon";
 import MobileHideWrapper from "./MobileHideWrapper";
 import { ReceiptText } from "lucide-react";
 

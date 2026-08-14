@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { SubmitButton } from "@/components/SubmitButton";
+import { SubmitButton } from "@/components/global/SubmitButton";
 import { createMaterialsBatch, type MaterialState, updateMaterial, deleteMaterial } from "@/lib/costs/action";
 import type { Material } from "@/lib/supabase/types";
 import Delete from "./DeleteMaterial";
 import { useCurrency } from "@/components/context/currencyContext";
-import Information from "@/components/Information";
+import Information from "@/components/global/Information";
 
 type MaterialDraft = {
   name: string;

@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { OrderState, updateOrder } from '@/lib/orders/action';
 import { ShareQuoteButton } from '@/components/quote/ShareQuoteButton';
 import { toast } from 'sonner';
-import { KebabMenu } from '@/components/KebabMenu';
+import { KebabMenu } from '@/components/global/KebabMenu';
 
 export default function OrderRows({
     orders,

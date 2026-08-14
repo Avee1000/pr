@@ -23,7 +23,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import useMediaQuery from "@/components/useMediaQuery";
+import useMediaQuery from "@/components/global/useMediaQuery";
 
 
 export default function AddButton() {

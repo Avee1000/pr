@@ -83,7 +83,7 @@ export default function QuoteAccessGate({ token }: QuoteAccessGateProps) {
 
         <CardContent className="space-y-4">
           {/* 24-Hour Expiration Banner */}
-          <div className="flex items-start gap-2.5 rounded-lg border border-amber-200/80 bg-amber-50/50 p-3 text-xs text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-300">
+          <div className="flex items-start gap-2.5 mb-6 rounded-lg border border-amber-200/80 bg-amber-50/50 p-3 text-xs text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-300">
             <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <p className="leading-normal">
               <span className="font-semibold">Important:</span> For security
@@ -124,7 +124,7 @@ export default function QuoteAccessGate({ token }: QuoteAccessGateProps) {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-brand font-medium text-ink hover:bg-brand/90 disabled:opacity-50"
+              className="w-full bg-brand font-medium mt-2  text-ink hover:bg-brand/90 disabled:opacity-50"
             >
               {isLoading ? (
                 <>

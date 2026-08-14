@@ -14,7 +14,7 @@ import {
     CommandItem,
     CommandList,
 } from '@/components/ui/command'
-import useMediaQuery from '../useMediaQuery'
+import useMediaQuery from '../global/useMediaQuery'
 
 interface CurrencySelectorProps {
     className?: string

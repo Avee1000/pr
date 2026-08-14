@@ -6,7 +6,7 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "./ui/hover-card"
+} from "../ui/hover-card"
 
 interface InformationProps {
   detail: string;

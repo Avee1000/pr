@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import useMediaQuery from '../useMediaQuery';
+import useMediaQuery from '../global/useMediaQuery';
 import {
     NavigationMenu,
     NavigationMenuContent,

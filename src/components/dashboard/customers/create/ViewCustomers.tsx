@@ -2,7 +2,7 @@
 
 import { Suspense, use, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Loading from '@/components/AnimateSpin';
+import Loading from '@/components/global/AnimateSpin';
 import { Customer } from '@/lib/supabase/types';
 import { columns } from "./columns"
 import { DataTable } from "./data-table"

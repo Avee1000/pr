@@ -12,7 +12,7 @@ import {
     CardDescription,
     CardContent,
 } from "@/components/ui/card";
-import { SubmitButton } from "../../../SubmitButton"; // Adjust path if needed based on your file structure
+import { SubmitButton } from "../../../global/SubmitButton"; // Adjust path if needed based on your file structure
 import { Customer } from "@/lib/supabase/types";
 import { useRouter } from 'next/navigation'
 

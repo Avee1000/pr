@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { shareToken } from '@/lib/orders/quotes/action'
 import { LoadingState } from '@/components/feedback/loading-state'
 import { Alert } from '@/components/feedback/alert'
-import Information from "@/components/Information";
+import Information from "@/components/global/Information";
 
 export default function QuoteLinkGenerator({ orderId }: { orderId: string }) {
     const [link, setLink] = useState<string | null>(null);

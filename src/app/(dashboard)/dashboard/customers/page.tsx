@@ -2,7 +2,7 @@
 import CustomersPage from "@/components/dashboard/customers/create/ViewPage";
 import AddButton from "@/components/dashboard/customers/create/AddButton";
 import Link from "next/link"
-import Information from "@/components/Information";
+import Information from "@/components/global/Information";
 
 export default async function CustomerFormPage() {
 

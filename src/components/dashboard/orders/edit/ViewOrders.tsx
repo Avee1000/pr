@@ -2,11 +2,11 @@
 
 import { useState, useEffect, Suspense, use, useMemo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Filter from '@/components/Filter';
+import Filter from '@/components/global/Filter';
 import { Loader } from 'lucide-react';
 import { OrderRowsProps, Customer } from '@/lib/supabase/types';
 import { toast } from 'sonner'
-import Loading from '@/components/AnimateSpin';
+import Loading from '@/components/global/AnimateSpin';
 import ViewSingleOrder from './ViewSingleOrder';
 import { OrderState, updateOrder } from '@/lib/orders/action';
 import { selectAllCustomers } from '@/lib/customers/action';

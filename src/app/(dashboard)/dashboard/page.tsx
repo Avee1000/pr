@@ -1,4 +1,4 @@
-import Name from '@/components/Names';
+import Name from '@/components/global/Names';
 import Link from 'next/link'
 import { createClient } from "@/lib/supabase/server";
 import CashFlowSummary from "@/components/dashboard/CashFlowSummary";

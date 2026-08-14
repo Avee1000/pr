@@ -17,7 +17,7 @@ import {
     CommandList,
 } from "@/components/ui/command"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { KebabMenu } from "@/components/KebabMenu"
+import { KebabMenu } from "@/components/global/KebabMenu"
 import Delete from "./DeleteOrder"
 import { ShareQuoteButton } from "@/components/quote/ShareQuoteButton"
 import { cn } from "@/lib/utils"
