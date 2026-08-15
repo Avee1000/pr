@@ -102,7 +102,7 @@ export default function OrderNavLinks() {
                                                 <IconComponent className="size-5" />
                                             </div>
                                             <div
-                                                className={`pl-8 transition-opacity duration-200 whitespace-nowrap text-sm  ${
+                                                className={`pl-8 transition-opacity duration-300 whitespace-nowrap text-sm  ${
                                                     isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                                                 }`}
                                             >

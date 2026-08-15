@@ -1,0 +1,4 @@
+fastapi>=0.128.8
+httpx
+pydantic>=2.13.4
+requests

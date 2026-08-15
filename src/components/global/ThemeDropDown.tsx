@@ -19,20 +19,20 @@ export default function ThemeToggleDropDown({ className }: { className?: string 
     }
 
     return (
-        <div className={cn("flex flex-col border-b p-2 gap-2 text-muted-foreground", className)}>
+        <div className={cn("flex flex-col border-b p-2 gap-1 text-ink-dark dark:text-muted-foreground", className)}>
             <p className="text-xs text-muted-foreground">Theme</p>
 
             <button
                 type="button"
                 onClick={() => setTheme('dark')}
                 className={cn(
-                    "flex items-center  gap-2 w-full px-3 py-2 rounded-md text-xs transition-colors text-left",
-                    "hover:bg-gray-200 dark:hover:bg-muted",
-                    theme === 'dark' && "bg-gray-200 dark:bg-muted font-medium"
+                    "flex items-center  gap-2 w-full px-3 py-2 rounded-md text-xs transition-colors hover:text-ink  dark:hover:text-muted-foreground text-left",
+                    "hover:bg-muted dark:hover:bg-muted",
+                    theme === 'dark' && "bg-muted dark:bg-muted font-medium"
                 )}
                 aria-label="Switch to dark theme"
             >
-                <Moon className="w-4 h-4 text-muted-foreground" />
+                <Moon className="w-4 h-4" />
                 <span>Dark</span>
             </button>
 
@@ -40,13 +40,13 @@ export default function ThemeToggleDropDown({ className }: { className?: string 
                 type="button"
                 onClick={() => setTheme('light')}
                 className={cn(
-                    "flex items-center gap-2 w-full px-3 py-2 rounded-md text-xs transition-colors text-left",
-                    "hover:bg-gray-200 dark:hover:bg-muted",
-                    theme === 'light' && "bg-gray-200 dark:bg-muted font-medium"
+                    "flex items-center gap-2 w-full px-3 py-2 rounded-md text-xs transition-colors text-left hover:text-ink  dark:hover:text-muted-foreground",
+                    "hover:bg-muted dark:hover:bg-muted",
+                    theme === 'light' && "bg-muted dark:bg-muted font-medium"
                 )}
                 aria-label="Switch to light theme"
             >
-                <Sun className="w-4 h-4 text-muted-foreground" />
+                <Sun className="w-4 h-4" />
                 <span>Light</span>
             </button>
         </div>

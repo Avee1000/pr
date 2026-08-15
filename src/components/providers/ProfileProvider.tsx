@@ -1,7 +1,7 @@
 import React from "react";
 import { createClient } from "@/lib/supabase/server";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 import { CurrencyProvider } from "@/components/context/currencyContext";
-import { init } from "next/dist/compiled/webpack/webpack";
 
 interface ProfilePreferences {
   currency: string;
@@ -9,23 +9,22 @@ interface ProfilePreferences {
   locale: string;
 }
 
-// Keep `async` - This makes it a Next.js Server Component!
-export async function ProfileProviderWrapper({
+export async function RootProviders({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
 
-  // 1. Fetch user on server
+  // 1. Single Auth Call on the Server
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   let initialProfile: ProfilePreferences | null = null;
 
+  // 2. Fetch profile only if user exists
   if (user) {
-    // 2. Fetch profile directly on server before HTML renders
     const { data } = await supabase
       .from("profiles")
       .select("currency, country, locale")
@@ -34,14 +33,15 @@ export async function ProfileProviderWrapper({
 
     if (data) {
       initialProfile = data as ProfilePreferences;
-      console.log(initialProfile)
     }
   }
 
-  // 3. Render client provider pre-populated with server data
+  // 3. Nest Client Providers with pre-hydrated server state
   return (
-    <CurrencyProvider initialProfile={initialProfile}>
-      {children}
-    </CurrencyProvider>
+    <AuthProvider initialUser={user}>
+      <CurrencyProvider initialProfile={initialProfile}>
+        {children}
+      </CurrencyProvider>
+    </AuthProvider>
   );
 }

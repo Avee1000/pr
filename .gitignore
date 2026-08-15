@@ -14,7 +14,6 @@
 
 # testing
 /coverage
-
 # next.js
 /.next/
 /out/
@@ -44,3 +43,14 @@ yarn-error.log*
 next-env.d.ts
 yarn.lock
 docs/superpowers/
+
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+python/__pycache__/main.cpython-39.pyc

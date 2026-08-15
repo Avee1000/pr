@@ -6,12 +6,14 @@ import { createClient } from "@/lib/supabase/server";
 import { cookies } from 'next/headers';
 import { getClientCountry } from "@/lib/geo/geo";
 import { z } from "zod";
+import { COUNTRIES } from "@/data/countries";
 
 export interface AuthFormState {
   errors?: {
     name?: string[];
     email?: string[];
     password?: string[];
+    country?: string[];
     _form?: string[]; // Global/root errors
   };
   message?: string;
@@ -20,6 +22,7 @@ export interface AuthFormState {
 const signUpSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   email: z.string().email("Please enter a valid email address."),
+  country: z.string().min(2, "Country is required."),
   password: z.string().min(6, "Password must be at least 6 characters."),
 });
 
@@ -30,6 +33,7 @@ export async function signUp(
   const validatedFields = signUpSchema.safeParse({
     name: String(formData.get("name") ?? "").trim(),
     email: String(formData.get("email") ?? "").trim(),
+    country: String(formData.get("country") ?? "").trim(),
     password: String(formData.get("password") ?? ""),
   });
 
@@ -39,11 +43,20 @@ export async function signUp(
     };
   }
 
-  const { name, email, password } = validatedFields.data;
+  const { name, email, password, country } = validatedFields.data;
   let isEmailConfirmationRequired = false;
 
+  const countryData = COUNTRIES.find((c) => c.code === country);
+
+  if (!countryData) {
+    return { errors: { country: ["Invalid country selected"] } };
+  }
+  
+  const locale = `${countryData.language}-${countryData.code}`;
+  const currency = countryData.currency;
+
   try {
-    const country = await getClientCountry();
+    // const profileCountry = await getClientCountry() || country;
     const supabase = await createClient();
 
     const { data, error } = await supabase.auth.signUp({
@@ -53,6 +66,8 @@ export async function signUp(
         data: {
           name,
           country,
+          locale,
+          currency,
         },
       },
     });
@@ -69,6 +84,23 @@ export async function signUp(
     if (!data.session) {
       isEmailConfirmationRequired = true;
     }
+
+    // const { data: profileData, error: profileError } = await supabase
+    //   .from('profiles')
+    //   .insert({currency: currency, locale: locale})
+    //   .select()
+    //   .single();
+
+    // if (profileError) {
+    //   console.error("Supabase insert error:", profileError);
+    //   return {
+    //     errors: {
+    //       _form: ["An unexpected error occurred. Please try again."],
+    //     },
+    //   };
+    // }
+
+
   } catch (error) {
     // Return unhandled exceptions as a root form error
     return {

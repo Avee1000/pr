@@ -9,7 +9,7 @@ import { Loader } from "lucide-react";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import TopLoader from "@/components/global/TopLoader";
 import { CurrencyProvider } from "@/components/context/currencyContext";
-import { ProfileProviderWrapper } from "@/components/providers/ProfileProvider";
+import { RootProviders } from "@/components/providers/ProfileProvider";
 import ReactQueryProvider from "@/components/providers/ReactQueryProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -52,7 +52,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ReactQueryProvider>
-            <ProfileProviderWrapper>
+            <RootProviders>
               <Header />
               <div className="relative">
                 <TopLoader />
@@ -69,7 +69,7 @@ export default function RootLayout({
                 />
                 <Footer />
               </div>
-            </ProfileProviderWrapper>
+            </RootProviders>
           </ReactQueryProvider>
         </ThemeProvider>
       </body>

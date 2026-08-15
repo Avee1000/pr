@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react"
 import { SUPPORTED_CURRENCIES } from "@/data/currencies"
 import { useQuery } from '@tanstack/react-query'
+import { getBaseUrl } from "@/utils/url"
 
 interface ProfilePreferences {
   currency: string;
@@ -24,7 +25,7 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 
 // Standalone fetch function
 async function fetchRates() {
-    const res = await fetch("http://127.0.0.1:8000/api/v2/rates?base=USD")
+    const res = await fetch("/api/v2/rates?base=USD")
     if (!res.ok) {
         throw new Error("Failed to fetch exchange rates")
     }
@@ -32,10 +33,19 @@ async function fetchRates() {
 }
 
 export function CurrencyProvider({ children, initialProfile }: { children: React.ReactNode; initialProfile: ProfilePreferences | null}) {
-    const [currency, setCurrency] = useState(`${initialProfile?.currency}` || "USD");
+    const [currency, setCurrency] = useState<string>(initialProfile?.currency ?? "USD")
     const [rates, setRates] = useState<Record<string, number>>({})
-    const [country] = useState(initialProfile?.country || "EUR");
-    console.log(country)
+    const [country, setCountry] = useState<string>(initialProfile?.country ?? "EUR")
+
+    useEffect(() => {
+        if (initialProfile?.currency) {
+            setCurrency(initialProfile.currency)
+        }
+        if (initialProfile?.country) {
+            setCountry(initialProfile.country)
+        }
+    }, [initialProfile])
+
     // Let TanStack Query handle state, caching, loading, and error handling
     const { data, isLoading: loading, isError, error } = useQuery({
         queryKey: ['currency-rates'],
@@ -56,7 +66,7 @@ export function CurrencyProvider({ children, initialProfile }: { children: React
 
     // Corrected object property lookup with fallback
     const currencySymbol =
-        SUPPORTED_CURRENCIES.find((item) => item.code === currency)?.symbol || "$"
+        SUPPORTED_CURRENCIES.find((item) => item.code === (currency || "USD"))?.symbol || "$"
 
     // Format function matching the interface return type
     const formatPrice = (amountInUSD: number): string => {

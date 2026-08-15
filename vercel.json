@@ -1,0 +1,22 @@
+{
+  "builds": [
+    {
+      "src": "python/main.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/v1/user-location",
+      "dest": "python/main.py"
+    },
+    {
+      "src": "/api/v2/(.*)",
+      "dest": "python/main.py"
+    }
+  ]
+}

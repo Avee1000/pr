@@ -39,7 +39,7 @@ export default function CurrencySelector({ className = '' }: CurrencySelectorPro
                     type="button"
                     role="combobox"
                     aria-expanded={open}
-                    className="border w-full h-8 rounded-lg border-zinc-300 px-3 mt-1 text-xs font-normal text-zinc-800 transition-colors focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 cursor-pointer flex items-center justify-between"
+                    className="border w-full h-8 rounded-md border-zinc-300 px-3 mt-1 text-xs font-normal text-zinc-800 transition-colors focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 cursor-pointer flex items-center justify-between"
                 >
                     <span className="truncate">
                         {selectedCurrencyObj
@@ -51,7 +51,7 @@ export default function CurrencySelector({ className = '' }: CurrencySelectorPro
 
                 </PopoverTrigger>
                 <PopoverContent
-                    className="prevent-menu-close w-(--radix-popover-trigger-width) p-0 z-60"
+                    className="prevent-menu-close rounded-md w-(--radix-popover-trigger-width) p-0 z-60"
                     side= {isMobile ? 'bottom' : 'left'}
                     align="start"
                 >

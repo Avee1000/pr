@@ -126,21 +126,22 @@ function PostsManager() {
 // --- Main Page Component (Wraps Provider locally to avoid missing context errors) ---
 export default function Page() {
   const [queryClient] = useState(() => new QueryClient());
-  const [userLocation, setUserLocation] = useState(null);
+  // const [userLocation, setUserLocation] = useState(null);
 
-  // 2. Safely call the async Server Action inside useEffect
-  useEffect(() => {
-    async function getUser() {
-      const data = await fetchUserLocation();
-      console.log('User Location:', data);
-      setUserLocation(data);
-    }
-    getUser();
-  }, []);
+  // // 2. Safely call the async Server Action inside useEffect
+  // useEffect(() => {
+  //   async function getUser() {
+  //     const data = await fetchUserLocation();
+  //     console.log('User Location:', data);
+  //     setUserLocation(data);
+  //   }
+  //   getUser();
+  // }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <PostsManager />
     </QueryClientProvider>
+
   );
 }
 

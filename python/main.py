@@ -10,7 +10,7 @@ from routers import location, rates
 # --- Application Lifespan (Startup & Shutdown) ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # STARTUP: Start the periodic rate-caching task from routers/rate.py
+    # STARTUP: Start the periodic rate-caching task from routers/rates.py
     rate_task = asyncio.create_task(rates.periodic_refresh())
     yield
     # SHUTDOWN: Cancel background tasks gracefully

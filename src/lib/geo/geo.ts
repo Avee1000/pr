@@ -30,8 +30,14 @@ export async function getClientCountry(): Promise<string> {
 
 export async function fetchUserLocation() {
   try {
-    const response = await axios.get("http://127.0.0.1:8000/api/v1/user-location");
+    const backendUrl =
+      process.env.NEXT_PUBLIC_FASTAPI_URL ??
+      process.env.FASTAPI_URL ??
+      "http://127.0.0.1:8000";
+
+    const response = await axios.get(`${backendUrl}/api/v1/user-location`);
     const result = response.data;
+    console.log(result)
 
     if (result.status === "success") {
       console.log("User IP:", result.data.ip);

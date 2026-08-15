@@ -17,11 +17,14 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const [rates, setRates] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
 
-  // Fetch rates from your Python FastAPI server
+  // Fetch rates through the Next.js rewrite so it works in both local dev and production.
   useEffect(() => {
     async function fetchRates() {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/v2/rates?base=USD")
+        const res = await fetch("/api/v2/rates?base=USD")
+        if (!res.ok) {
+          throw new Error(`Failed to fetch exchange rates: ${res.status}`)
+        }
         const data = await res.json()
         setRates(data.rates)
       } catch (err) {

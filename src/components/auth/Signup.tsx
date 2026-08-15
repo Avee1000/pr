@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useActionState, useState, useEffect } from "react";
 import { signUp, type AuthFormState } from "@/app/(auth)/actions";
 import { SubmitButton } from "@/components/global/SubmitButton";
-import { ArrowRight, AlertCircle, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { ArrowRight, AlertCircle, Eye, EyeOff, CheckCircle, Code } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,6 +14,7 @@ import {
     CardDescription,
     CardContent,
 } from "@/components/ui/card";
+import { CountryAndPhoneForm } from "./CountrySelect";
 import { ro } from "date-fns/locale";
 
 const passwordRequirements = [
@@ -30,7 +31,10 @@ export function SignUpForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [state, formAction] = useActionState(signUp, initialState);
     const [error, setError] = useState(false);
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
 
+    console.log(formAction)
     // Password validation state
     const [password, setPassword] = useState("");
     const [validations, setValidations] = useState({
@@ -44,12 +48,11 @@ export function SignUpForm() {
     // Helper flags
     const fieldErrors = state.errors;
     const rootError = fieldErrors?._form?.[0];
-
     useEffect(() => {
         if (fieldErrors) {
-            setError(true);
-            const timer = setTimeout(() => setError(false), 5000);
-            return () => clearTimeout(timer);
+            // setError(true);
+            // const timer = setTimeout(() => setError(false), 5000);
+            // return () => clearTimeout(timer);
         }
     }, [fieldErrors, rootError]);
 
@@ -72,8 +75,24 @@ export function SignUpForm() {
         validations.hasSpecialChar,
     ];
 
+    // Dynamic Validation checks
+    const isNameValid = name.trim().length >= 2;
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const isPasswordValid = requirementChecks.every(Boolean);
+
+    // Helper to generate dynamic styles
+    const getFieldStyles = (hasError: boolean, isValid: boolean, value: string) => {
+        if (hasError) {
+            return "border-destructive focus-visible:ring-destructive";
+        }
+        if (isValid && value.trim().length > 0) {
+            return "border-emerald-500 focus-visible:ring-emerald-500 bg-emerald-500/5";
+        }
+        return "";
+    };
+
     return (
-        <Card>
+        <Card className="w-lg mx-auto">
             <CardHeader>
                 <CardTitle className="font-heading text-2xl font-bold">Create your account</CardTitle>
                 <CardDescription>
@@ -81,7 +100,7 @@ export function SignUpForm() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <form action={formAction} className="flex flex-col gap-4">
+                <form action={formAction} className="flex flex-col gap-6" noValidate>
                     {/* Root / Global Error Banner */}
                     {rootError && (
                         <div
@@ -103,6 +122,8 @@ export function SignUpForm() {
                             type="text"
                             placeholder="John Doe"
                             autoComplete="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             required
                             aria-invalid={Boolean(fieldErrors?.name)}
                             aria-describedby={fieldErrors?.name ? "name-error" : undefined}
@@ -114,6 +135,47 @@ export function SignUpForm() {
                             </p>
                         )}
                     </div>
+                    {/* <Input
+                                id="country"
+                                name="country"
+                                type="text"
+                                placeholder="John Doe"
+                                autoComplete="name"
+                                required
+                                aria-invalid={Boolean(fieldErrors?.name)}
+                                aria-describedby={fieldErrors?.name ? "name-error" : undefined}
+                                className={fieldErrors?.name ? "border-destructive focus-visible:ring-destructive" : ""}
+                            />
+                            {fieldErrors?.name && (
+                                <p id="name-error" className="text-xs font-medium text-destructive">
+                                    {fieldErrors.name[0]}
+                                </p>
+                            )} */}
+
+                    {/* <Label htmlFor="phone">Phone No</Label>
+                            <Input
+                                id="phone"
+                                name="phone"
+                                type="text"
+                                placeholder="John Doe"
+                                autoComplete="name"
+                                required
+                                aria-invalid={Boolean(fieldErrors?.name)}
+                                aria-describedby={fieldErrors?.name ? "name-error" : undefined}
+                                className={fieldErrors?.name ? "border-destructive focus-visible:ring-destructive" : ""}
+                            />
+                            {fieldErrors?.name && (
+                                <p id="name-error" className="text-xs font-medium text-destructive">
+                                    {fieldErrors.name[0]}
+                                </p>
+                            )} */}
+
+                    <div>
+                        <div className="flex flex-col gap-1.5">
+                            <CountryAndPhoneForm error={fieldErrors?.country?.[0]} />
+                        </div>
+                    </div>
+
 
                     {/* Email Field */}
                     <div className="flex flex-col gap-1.5">
@@ -124,6 +186,8 @@ export function SignUpForm() {
                             type="email"
                             placeholder="name@example.com"
                             autoComplete="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                             aria-invalid={Boolean(fieldErrors?.email)}
                             aria-describedby={fieldErrors?.email ? "email-error" : undefined}
@@ -175,26 +239,25 @@ export function SignUpForm() {
                                 {fieldErrors.password[0]}
                             </p>
                         ) : ( */}
-                            <p id="password-hint" className="text-xs text-muted-foreground flex flex-col items-start gap-1 mt-1">
-                                {passwordRequirements.map((requirement, index) => {
-                                    const isMet = requirementChecks[index];
-                                    return (
-                                        <span 
-                                            key={index} 
-                                            className={`flex items-center gap-1.5 transition-colors ${
-                                                isMet 
-                                                    ? "text-emerald-600 font-medium" 
-                                                    : fieldErrors?.password 
-                                                    ? "text-destructive!" 
-                                                    : "text-muted-foreground"
+                        <p id="password-hint" className="text-xs text-muted-foreground flex flex-col items-start gap-1 mt-1">
+                            {passwordRequirements.map((requirement, index) => {
+                                const isMet = requirementChecks[index];
+                                return (
+                                    <span
+                                        key={index}
+                                        className={`flex items-center gap-1.5 transition-colors ${isMet
+                                            ? "text-emerald-600 font-medium"
+                                            : fieldErrors?.password
+                                                ? "text-destructive!"
+                                                : "text-muted-foreground"
                                             }`}
-                                        >
-                                            <CheckCircle className={`size-3.5 ${isMet ? "text-emerald-600" : "text-muted-foreground/50"}`} />
-                                            {requirement}
-                                        </span>
-                                    );
-                                })}
-                            </p>
+                                    >
+                                        <CheckCircle className={`size-3.5 ${isMet && isPasswordValid ? "text-emerald-600" : "text-muted-foreground/50"}`} />
+                                        {requirement}
+                                    </span>
+                                );
+                            })}
+                        </p>
                         {/* )} */}
                     </div>
 

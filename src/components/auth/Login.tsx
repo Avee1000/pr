@@ -25,13 +25,13 @@ export function LoginForm() {
   const rootError = fieldErrors?._form?.[0];
 
   return (
-    <Card>
+    <Card >
       <CardHeader>
         <CardTitle className="font-heading text-2xl font-bold">Welcome back</CardTitle>
         <CardDescription>Sign in to your PriceRight workspace.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="flex flex-col gap-4" noValidate>
+        <form action={formAction} className="flex flex-col gap-6" noValidate>
           {/* Root / Global Error Banner */}
           {rootError && (
             <div

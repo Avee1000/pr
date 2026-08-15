@@ -3,8 +3,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { SignOutButton } from '../accounts/SignOutButton'
 import Name from '../global/Names'
+import { User2 } from 'lucide-react'
 import ThemeToggleDropDown from "../global/ThemeDropDown"
-import CurrencySelector from './CurrencySelector' // <--- 1. Import Here
+import CurrencySelector from './CurrencySelector' //
+import Link from 'next/link'
 
 export default function UserMenu({ user, children }: { user: any; children?: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -76,13 +78,20 @@ export default function UserMenu({ user, children }: { user: any; children?: Rea
           className="absolute right-0 mt-2 -mr-3 w-56 rounded-xl bg-white dark:bg-ink shadow-xl border py-2 z-50 animate-in fade-in zoom-in-50 duration-300"
           role="menu"
         >
-          <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
+          <div className="px-4 py-3 border-b">
             <p className="text-sm font-semibold truncate">
               {user?.user_metadata?.name || 'User'}
             </p>
-            <p className="text-xs text-zinc-500 truncate">
+            <p className="text-xs text-muted-foreground truncate">
               {user?.email}
             </p>
+          </div>
+
+          <div className="border-b px-2 py-1 flex items-center text-ink-dark dark:text-muted-foreground">
+            <Link href="/account/settings" className="py-2 px-3 hover:bg-muted hover:text-ink  dark:hover:text-muted-foreground dark:hover:bg-muted flex items-center  gap-2 w-full rounded-md text-xs transition-colors text-left">
+              <User2 className="w-4 h-4" />
+              <span>Account</span>
+            </Link>
           </div>
 
           {/* Menu Items */}

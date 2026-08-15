@@ -4,6 +4,7 @@ export interface CountryData {
   phone_code: string; // International phone calling code (e.g. "+233")
   currency: string;   // ISO 4217 currency code (e.g. "GHS")
   language: string;   // ISO 639-1 language code (e.g. "en")
+  // flag: string;      
 }
 
 // Type for the full country array
