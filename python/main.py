@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import router modules from the /routers folder
-from routers import location, rates
+from .routers import location, rates
 
 
 # --- Application Lifespan (Startup & Shutdown) ---
