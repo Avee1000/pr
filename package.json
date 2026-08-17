@@ -6,7 +6,7 @@
     "dev:frontend": "next dev -p 3000",
     "dev:backend": "cd python && uvicorn main:app --reload --port 8000",
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint"
   },
