@@ -1,7 +1,7 @@
 import Link from "next/link";
 import OrderBoard, { BoardCard } from "@/components/dashboard/orders/board/OrderBoard";
 import { selectAllOrders } from "@/lib/orders/action";
-import { OrderStatus, PaymentStatus } from "@/lib/supabase/types";
+import { OrderStatus, PaymentStatus } from "@/lib/types/dashBoardTypes";
 import Information from "@/components/global/Information";
 
 export default async function OrderBoardPage() {
@@ -18,7 +18,7 @@ export default async function OrderBoardPage() {
   }));
 
   return (
-    <div className="dark:bg-ink min-h-screen flex-1 w-auto m-1 rounded-md shadow-[0_0_15px_rgba(0,0,0,0.2)]">
+    <div className="dark:bg-ink min-h-screen flex-1 w-auto sm:m-1 sm:rounded-md shadow-[0_0_15px_rgba(0,0,0,0.2)]">
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div className="mb-8">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">

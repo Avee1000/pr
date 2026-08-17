@@ -1,4 +1,4 @@
-import { Customer } from "@/lib/supabase/types";
+import { Customer } from "@/lib/types/dashBoardTypes";
 import { selectOneCustomer, updateCustomer } from "@/lib/customers/action";
 import EditCustomerForm from "@/components/dashboard/customers/edit/EditCustomerForm";
 

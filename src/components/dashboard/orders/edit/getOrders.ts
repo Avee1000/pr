@@ -1,4 +1,4 @@
-import { OrderRowsProps } from '@/lib/supabase/types';
+import { OrderRowsProps } from '@/lib/types/dashBoardTypes';
 import { selectAllOrders } from '@/lib/orders/action';
 
 

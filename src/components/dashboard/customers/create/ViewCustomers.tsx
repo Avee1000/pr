@@ -3,7 +3,7 @@
 import { Suspense, use, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Loading from '@/components/global/AnimateSpin';
-import { Customer } from '@/lib/supabase/types';
+import { Customer } from '@/lib/types/dashBoardTypes';
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
 

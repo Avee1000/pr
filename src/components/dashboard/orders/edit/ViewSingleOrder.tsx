@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, User, Calendar, DollarSign, FileText, Copy, CheckCircle2 } from 'lucide-react'
-import { OrderRowsProps, orderStatusColors, paymentStatusColors } from '@/lib/supabase/types'
+import { OrderRowsProps, orderStatusColors, paymentStatusColors } from '@/lib/types/dashBoardTypes'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import QuoteLinkGenerator from "./QuoteLinkGenerator";
@@ -64,7 +64,7 @@ export default function ViewSingleOrder({ orderData, isOpen, onClose }: ViewSing
                 role="dialog"
                 aria-label="Order Details Panel"
                 aria-hidden={!isOpen}
-                className={`fixed top-0 bottom-0 right-0 z-40 m-1 ml-0 w-80 sm:w-110 rounded-2xl bg-white dark:bg-zinc-900 border-l border-border shadow-2xl transition-transform duration-300 ease-in-out transform-gpu will-change-transform flex flex-col ${
+                className={`fixed top-0 bottom-0 right-0 z-40 m-1 ml-0 w-[98%] sm:w-110 rounded-2xl bg-white dark:bg-zinc-900 border-l border-border shadow-2xl transition-transform duration-300 ease-in-out transform-gpu will-change-transform flex flex-col ${
                     isOpen && activeOrder ? 'translate-x-0' : 'translate-x-[101%]'
                 }`}
             >

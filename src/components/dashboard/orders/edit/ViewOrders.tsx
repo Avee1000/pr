@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense, use, useMemo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation';
 import Filter from '@/components/global/Filter';
 import { Loader } from 'lucide-react';
-import { OrderRowsProps, Customer } from '@/lib/supabase/types';
+import { OrderRowsProps, Customer } from '@/lib/types/dashBoardTypes';
 import { toast } from 'sonner'
 import Loading from '@/components/global/AnimateSpin';
 import ViewSingleOrder from './ViewSingleOrder';

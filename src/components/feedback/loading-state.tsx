@@ -75,7 +75,7 @@ export function LoadingState({
           )}
 
           {description && (
-            <p className={cn("mt-1 max-w-xs text-slate-500 dark:text-slate-400", styles.desc)}>
+            <p className={cn("max-w-xs ", styles.desc)}>
               {description}
             </p>
           )}</>

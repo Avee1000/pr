@@ -60,8 +60,8 @@ export default function OrderNavLinks() {
 
     return (
         <aside
-            className={`h-auto transition-[width] duration-300 ease-in-out select-none pt-1 pl-1 pb-1  ${
-                isOpen ? "sm:w-50 lg:w-64" : "w-16"
+            className={`h-auto transition-[width] hidden sm:block duration-300 ease-in-out select-none pt-1 pl-1 pb-1  ${
+                isOpen ? "sm:w-50 lg:w-60" : "w-16"
             }`}
         >
             <section

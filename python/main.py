@@ -1,10 +1,17 @@
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+    
 import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import router modules from the /routers folder
-from .routers import location, rates
+from routers import location, rates
 
 
 # --- Application Lifespan (Startup & Shutdown) ---

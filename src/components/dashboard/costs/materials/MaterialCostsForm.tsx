@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SubmitButton } from "@/components/global/SubmitButton";
 import { createMaterialsBatch, type MaterialState, updateMaterial, deleteMaterial } from "@/lib/costs/action";
-import type { Material } from "@/lib/supabase/types";
+import type { Material } from "@/lib/types/dashBoardTypes";
 import Delete from "./DeleteMaterial";
 import { useCurrency } from "@/components/context/currencyContext";
 import Information from "@/components/global/Information";

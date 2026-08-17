@@ -8,7 +8,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { Loader } from "lucide-react";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import TopLoader from "@/components/global/TopLoader";
-import { CurrencyProvider } from "@/components/context/currencyContext";
 import { RootProviders } from "@/components/providers/ProfileProvider";
 import ReactQueryProvider from "@/components/providers/ReactQueryProvider";
 
@@ -44,10 +43,21 @@ export default function RootLayout({
         poppins.variable,
       )}
     >
+      <head>
+        {/* Pre-hydration theme script: sets `dark` class on <html> before first paint
+            so production HTML doesn't flash light→dark. Mirrors the storage key +
+            defaultTheme + enableSystem used by next-themes below. Keep in sync with
+            the <ThemeProvider> props; mismatches cause a hydration flash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="flex min-h-screen flex-col bg-background max-w-full text-foreground overflow-x-hidden">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >

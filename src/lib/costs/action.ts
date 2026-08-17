@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "../supabase/server";
-import type { LaborCost, Material, TargetProfit } from "../supabase/types";
+import type { LaborCost, Material, TargetProfit } from "../types/dashBoardTypes";
 
 function formatDbErrorMessage(error: { message: string }, fallback: string) {
   if (error.message.includes("Could not find the table 'public.material_costs'")) {

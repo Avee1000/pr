@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { OrderRowsProps, Customer } from '@/lib/supabase/types';
+import { OrderRowsProps, Customer } from '@/lib/types/dashBoardTypes';
 import { Edit2, Check, X, ChevronsUpDown, LucideInfo } from 'lucide-react';
 import Delete from '../edit/DeleteOrder';
-import { orderStatusColors, paymentStatusColors } from '@/lib/supabase/types';
+import { orderStatusColors, paymentStatusColors } from '@/lib/types/dashBoardTypes';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

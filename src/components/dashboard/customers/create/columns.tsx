@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { createColumnHelper } from "@tanstack/react-table"
 import { ChevronsUpDown, Edit2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Customer } from '@/lib/supabase/types'
+import { Customer } from '@/lib/types/dashBoardTypes'
 import Delete from '../edit/DeleteCustomer'
 import { type DataTableFeatures } from "./data-table-features"
 import { KebabMenu } from '@/components/global/KebabMenu'

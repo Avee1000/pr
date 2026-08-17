@@ -13,7 +13,7 @@ export default function NotFound() {
             />
 
             {/* Main Content Area */}
-            <main className="relative z-10 mx-auto flex w-full max-w-280 flex-1 flex-wrap items-center justify-between gap-12 px-12 pt-10 pb-24">
+            <main className="relative z-10 mx-auto flex flex-col-reverse sm:flex-row w-full max-w-280 flex-1 flex-wrap items-center justify-between gap-12 px-12 pt-10 pb-24">
 
                 {/* Left Column: Text & Navigation */}
                 <div className="max-w-120 flex-1 basis-105">

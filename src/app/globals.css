@@ -54,6 +54,7 @@
   --color-action: #ff4a3c;
   --color-action-foreground: #ffffff;
   --color-ink: #1a1a1a;
+  --color-ink-darker: #131313;
   --color-ink-dark: #4c4c4c;
 }
 
@@ -79,9 +80,6 @@ button {
   cursor: pointer;
 }
 
-strong {
-  color: #754f29
-}
 
 @theme inline {
   --font-heading: var(--font-sans);
@@ -239,3 +237,6 @@ html, body {
   overflow: hidden; 
 }
 
+/* ::after {
+  color: #131313;
+} */

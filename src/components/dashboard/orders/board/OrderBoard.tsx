@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updateOrderStatus } from "@/lib/orders/action";
-import { OrderStatus, paymentStatusColors, PaymentStatus } from "@/lib/supabase/types";
+import { OrderStatus, paymentStatusColors, PaymentStatus } from "@/lib/types/dashBoardTypes";
 
 export interface BoardCard {
     id: string;

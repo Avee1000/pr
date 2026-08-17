@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import { cn } from "@/lib/utils"
 
 export default function ThemeToggleDropDown({ className }: { className?: string }) {
-    const { theme, setTheme } = useTheme()
+    const { resolvedTheme, setTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
@@ -28,7 +28,7 @@ export default function ThemeToggleDropDown({ className }: { className?: string 
                 className={cn(
                     "flex items-center  gap-2 w-full px-3 py-2 rounded-md text-xs transition-colors hover:text-ink  dark:hover:text-muted-foreground text-left",
                     "hover:bg-muted dark:hover:bg-muted",
-                    theme === 'dark' && "bg-muted dark:bg-muted font-medium"
+                    resolvedTheme === 'dark' && "bg-muted dark:bg-muted font-medium"
                 )}
                 aria-label="Switch to dark theme"
             >
@@ -42,7 +42,7 @@ export default function ThemeToggleDropDown({ className }: { className?: string 
                 className={cn(
                     "flex items-center gap-2 w-full px-3 py-2 rounded-md text-xs transition-colors text-left hover:text-ink  dark:hover:text-muted-foreground",
                     "hover:bg-muted dark:hover:bg-muted",
-                    theme === 'light' && "bg-muted dark:bg-muted font-medium"
+                    resolvedTheme === 'light' && "bg-muted dark:bg-muted font-medium"
                 )}
                 aria-label="Switch to light theme"
             >

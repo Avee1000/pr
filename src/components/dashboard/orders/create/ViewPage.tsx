@@ -1,7 +1,7 @@
 import { selectAllCustomers } from "@/lib/customers/action";
 import { selectAllMaterials, selectLaborCost, selectTargetProfit } from "@/lib/costs/action";
 import OrderForm from "./OrderForm";
-import { Customer, LaborCost, Material, TargetProfit } from "@/lib/supabase/types";
+import { Customer, LaborCost, Material, TargetProfit } from "@/lib/types/dashBoardTypes";
 
 async function getCustomers() {
   const customers = await selectAllCustomers();

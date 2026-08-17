@@ -13,7 +13,7 @@ import {
     CardContent,
 } from "@/components/ui/card";
 import { SubmitButton } from "../../../global/SubmitButton"; // Adjust path if needed based on your file structure
-import { Customer } from "@/lib/supabase/types";
+import { Customer } from "@/lib/types/dashBoardTypes";
 import { useRouter } from 'next/navigation'
 
 const CustomerFormSchema = z.object({

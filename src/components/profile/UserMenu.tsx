@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { SignOutButton } from '../accounts/SignOutButton'
+import { SignOutButton } from '../auth/SignOutButton'
 import Name from '../global/Names'
 import { User2 } from 'lucide-react'
 import ThemeToggleDropDown from "../global/ThemeDropDown"
@@ -64,7 +64,7 @@ export default function UserMenu({ user, children }: { user: any; children?: Rea
         </div>
 
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-w-xs opacity-100 pl-2 pr-3" : "max-w-0 opacity-0 px-0"
+          className={`overflow-hidden hidden transition-all duration-300 ease-in-out ${isOpen ? "max-w-xs opacity-100 pl-2 pr-3" : "max-w-0 opacity-0 px-0"
             }`}
         >
           <span className="text-sm font-medium sm:block truncate max-w-20 whitespace-nowrap">
@@ -88,7 +88,7 @@ export default function UserMenu({ user, children }: { user: any; children?: Rea
           </div>
 
           <div className="border-b px-2 py-1 flex items-center text-ink-dark dark:text-muted-foreground">
-            <Link href="/account/settings" className="py-2 px-3 hover:bg-muted hover:text-ink  dark:hover:text-muted-foreground dark:hover:bg-muted flex items-center  gap-2 w-full rounded-md text-xs transition-colors text-left">
+            <Link href="/account/profile" className="py-2 px-3 hover:bg-muted hover:text-ink  dark:hover:text-muted-foreground dark:hover:bg-muted flex items-center  gap-2 w-full rounded-md text-xs transition-colors text-left">
               <User2 className="w-4 h-4" />
               <span>Account</span>
             </Link>

@@ -1,7 +1,7 @@
 "use client"
 
 import { createColumnHelper, type ColumnDef } from "@tanstack/react-table"
-import { OrderRowsProps, Customer, OrderStatus, PaymentStatus } from "@/lib/supabase/types"
+import { OrderRowsProps, Customer, OrderStatus, PaymentStatus } from "@/lib/types/dashBoardTypes"
 import { Button } from "@/components/ui/button"
 import {
     Popover,
@@ -22,7 +22,7 @@ import Delete from "./DeleteOrder"
 import { ShareQuoteButton } from "@/components/quote/ShareQuoteButton"
 import { cn } from "@/lib/utils"
 import { Edit2, Check, X, ChevronsUpDown, LucideInfo } from "lucide-react"
-import { orderStatusColors, paymentStatusColors } from "@/lib/supabase/types"
+import { orderStatusColors, paymentStatusColors } from "@/lib/types/dashBoardTypes"
 import { DataTableFeatures } from "@/components/dashboard/orders/edit/data-table"
 import { FormattedPrice } from "@/components/context/FormattedPrice"
 

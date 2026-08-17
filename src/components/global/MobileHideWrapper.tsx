@@ -4,16 +4,16 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, ReactNode } from "react";
 
 interface HideOnMobileRoutesProps {
-  children: ReactNode;
-  /** Array of route paths where children should hide on mobile (e.g. ["/login", "/signup"]) */
-  routes: string[];
-  /** Screen width in pixels to trigger mobile hiding. Defaults to 768. */
+  children?: ReactNode;
+  ElementToBeShown?: ReactNode;
+  ElementToBeHidden?: ReactNode;
+  routes?: string[];
   breakpoint?: number;
 }
 
 export default function MobileHideWrapper({
   children,
-  routes,
+  routes = [],
   breakpoint = 768,
 }: HideOnMobileRoutesProps) {
   const pathname = usePathname();
@@ -28,17 +28,13 @@ export default function MobileHideWrapper({
       setIsMobile(e.matches);
     };
 
-    // Initial match check
     handleResize(mediaQuery);
-
     mediaQuery.addEventListener("change", handleResize);
     return () => mediaQuery.removeEventListener("change", handleResize);
   }, [breakpoint]);
 
-  // Check if current pathname matches any route in the array
   const isTargetRoute = routes.includes(pathname);
 
-  // Before hydration on client, use CSS class hiding to prevent layout flicker
   if (!mounted) {
     if (isTargetRoute) {
       return <div className="max-sm:hidden">{children}</div>;
@@ -46,10 +42,22 @@ export default function MobileHideWrapper({
     return <>{children}</>;
   }
 
-  // If on one of the target routes AND screen is mobile, hide children
   if (isTargetRoute && isMobile) {
     return null;
   }
 
   return <>{children}</>;
+}
+
+export function OtherMobileNav({ ElementToBeShown, ElementToBeHidden }: HideOnMobileRoutesProps) {
+    const pathname = usePathname();
+    const isNotDashboardRoute = !pathname.startsWith('/dashboard');
+    const isAccountRoute = pathname.startsWith('/account');
+    
+    // Wrapped in a responsive container to avoid layout double-rendering conflicts
+    return (
+        <div className="max-sm:block hidden">
+            {isNotDashboardRoute && isAccountRoute ? ElementToBeHidden : ElementToBeShown}
+        </div>
+    );
 }

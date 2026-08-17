@@ -6,7 +6,7 @@ import { User, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { getTestimonials } from "@/lib/testimonials/action";
-import { Testimonial } from "@/lib/supabase/types";
+import { Testimonial } from "@/lib/types/dashBoardTypes";
 
 async function fetchTestimonials(locale: string): Promise<Testimonial[]> {
     try {

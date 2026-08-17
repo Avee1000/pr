@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from "@/lib/supabase/server";
-import { Testimonial } from "../supabase/types";
+import { Testimonial } from "../types/dashBoardTypes";
 
 export async function getTestimonials( locale = "en"): Promise<Testimonial[]> {
 const supabase = await createClient();

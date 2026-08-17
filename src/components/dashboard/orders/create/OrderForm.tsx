@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { createOrder, OrderState } from "@/lib/orders/action";
 import { Calendar } from "@/components/ui/calendar"
 import { format } from 'date-fns'
-import type { LaborCost, Material, TargetProfit } from "@/lib/supabase/types";
+import type { LaborCost, Material, TargetProfit } from "@/lib/types/dashBoardTypes";
 import { FormattedPrice } from "@/components/context/FormattedPrice";
 
 interface Customer {

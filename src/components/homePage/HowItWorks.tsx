@@ -5,9 +5,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Sliders, Send, CheckCircle2, ArrowRight } from "lucide-react";
 
-/* ------------------------------------------------------------------ */
 /*  Scroll-reveal hook                                                 */
-/* ------------------------------------------------------------------ */
 
 function useInView<T extends HTMLElement>(threshold = 0.4) {
   const ref = useRef<T | null>(null);
@@ -34,9 +32,7 @@ function useInView<T extends HTMLElement>(threshold = 0.4) {
   return { ref, inView };
 }
 
-/* ------------------------------------------------------------------ */
 /*  Data — the three stages of the pipeline, in the order they run     */
-/* ------------------------------------------------------------------ */
 
 const steps = [
   {
@@ -71,9 +67,7 @@ const steps = [
   },
 ] as const;
 
-/* ------------------------------------------------------------------ */
 /*  A single stage on the timeline                                     */
-/* ------------------------------------------------------------------ */
 
 function Stage({
   step,

@@ -5,7 +5,7 @@ import Information from "@/components/global/Information";
 
 export default function OrderPage() {
   return (
-    <div className="dark:bg-ink min-h-screen flex-1 w-auto m-1 rounded-md shadow-[0_0_15px_rgba(0,0,0,0.2)]">
+    <div className="dark:bg-ink min-h-screen flex-1 w-auto sm:m-1 sm:rounded-md shadow-[0_0_15px_rgba(0,0,0,0.2)]">
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div className="flex flex-row justify-between w-full">
           <div className="mb-8">
