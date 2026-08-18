@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCashFlowSummary } from "@/lib/dashboard/cashflow";
-import { FormattedPrice } from "@/components/context/FormattedPrice"; // 👈 Import the Client Leaf
+import { FormattedPrice } from "@/components/context/FormattedPrice";
 
 export default async function CashFlowSummary() {
   const summary = await getCashFlowSummary();

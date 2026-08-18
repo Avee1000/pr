@@ -1,14 +1,13 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import OrderNavLinks from "@/components/dashboard/DashboardNavigation";
+import Header from "@/components/global/Header";
 
 export default async function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Protect the whole dashboard group: an unauthenticated visitor is sent to
-  // login before they can see any dashboard or orders content.
   const supabase = await createClient();
   const {
     data: { user },
@@ -19,10 +18,15 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden text-base dark:bg-white!">
-      <div className="flex flex-col sm:flex-row w-full min-w-0 border-border">
-          <OrderNavLinks />
-        <div className="flex-1  min-w-0 *:scrollbar-thin ">{children}</div>
+    <div className="flex flex-col h-screen overflow-hidden bg-gray-100 dark:bg-ink">
+      <div className="shrink-0">
+        <Header />
+      </div>
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        <OrderNavLinks />
+        <main className="flex-1 min-h-0 min-w-0 overflow-y-auto bg-white dark:bg-ink-darker h-auto sm:my-1.5 scrollbar-thumb-ink scrollbar-thin dark:scrollbar-thumb-muted-foreground sm:m-1.5 sm:ml-0 sm:rounded-md shadow-[0_0_10px_rgba(0,0,0,0.15)] max-sm:mx-0">
+          {children}
+        </main>
       </div>
     </div>
   );

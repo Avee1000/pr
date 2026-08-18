@@ -17,11 +17,7 @@ export default async function OrdersDashboard() {
   } = await supabase.auth.getUser();
 
   return (
-    <div
-      className="dark:bg-ink min-h-screen text-ink dark:white  flex-1 w-auto sm:m-1 sm:rounded-md shadow-[0_0_15px_rgba(0,0,0,0.2)] bg-white"
-    >
-
-      <main className="p-8 max-w-7xl mx-auto">
+      <div className="p-8 max-w-7xl mx-auto">
         <div>
           <h1 className="text-2xl font-bold font-heading text-ink dark:text-white">
             {/* If full_name is undefined, it will pass "Guest" instead */}
@@ -50,7 +46,6 @@ export default async function OrdersDashboard() {
             </Link>
           ))}
         </nav>
-      </main>
-    </div>
+      </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { User, Mail, Globe, Phone, ArrowRight, AlertCircle } from "lucide-react";
+import { User, Mail, Globe, Phone, ArrowRight, AlertCircle, PlusIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -104,7 +104,7 @@ export default function CustomerForm({ action, onSuccess }: CustomerFormProps) {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <form action={formAction} className="flex flex-col gap-8 ">
+                <form action={formAction} className="flex flex-col gap-8 max-sm:mt-5">
                     {/* {state.message && !state.success && (
                         <div
                             role="alert"
@@ -116,7 +116,7 @@ export default function CustomerForm({ action, onSuccess }: CustomerFormProps) {
                         </div>
                     )} */}
 
-                    <div className="flex flex-col gap-2"> 
+                    <div className="flex flex-col gap-2">
                         <Label htmlFor="name" className=" font-medium">
                             <User className="size-4 text-muted-foreground" /> Name
                         </Label>
@@ -128,7 +128,7 @@ export default function CustomerForm({ action, onSuccess }: CustomerFormProps) {
                                 placeholder="First Name, Middle Name, Last Name"
                                 autoComplete="name"
                                 required
-                                className="pl-5 rounded-xl"
+                                className="pl-5 rounded-xl max-sm:text-sm"
                                 onChange={(e) => setName(e.target.value)}
                             />
                         </div>
@@ -138,7 +138,7 @@ export default function CustomerForm({ action, onSuccess }: CustomerFormProps) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="email" className="font-medium">
+                        <Label htmlFor="email" className="font-medium max-sm:text-sm">
                             <Mail className="size-4 text-muted-foreground" /> Email
                         </Label>
                         <div className="relative flex items-center">
@@ -151,7 +151,7 @@ export default function CustomerForm({ action, onSuccess }: CustomerFormProps) {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="pl-5 rounded-xl"
+                                className="pl-5 rounded-xl max-sm:text-sm"
                             />
                         </div>
                         {showErrors && state.errors?.email && (
@@ -162,7 +162,7 @@ export default function CustomerForm({ action, onSuccess }: CustomerFormProps) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="country" className="font-medium">
-                                <Globe className="size-4 text-muted-foreground" /> Country                         </Label>
+                                <Globe className="size-4 text-muted-foreground" /> Country </Label>
                             <div className="relative flex items-center">
                                 <Input
                                     id="country"
@@ -179,8 +179,8 @@ export default function CustomerForm({ action, onSuccess }: CustomerFormProps) {
                             )}
                         </div>
                         <div className="flex flex-col gap-2">
-                            <Label htmlFor="phone" className="font-medium">
-                                <Phone className="size-4 text-muted-foreground" /> Phone Number                         </Label>
+                            <Label htmlFor="phone" className="font-medium max-sm:text-sm">
+                                <Phone className="size-4 text-muted-foreground" /> Phone Number</Label>
                             <div className="relative flex items-center">
                                 <Input
                                     id="phone"
@@ -189,7 +189,7 @@ export default function CustomerForm({ action, onSuccess }: CustomerFormProps) {
                                     placeholder="+1 (555) 000-0000"
                                     autoComplete="tel"
                                     required
-                                    className="pl-5 rounded-xl"
+                                    className="pl-5 rounded-xl max-sm:text-sm"
                                 />
                             </div>
                             {showErrors && state.errors?.phone && (
@@ -200,8 +200,8 @@ export default function CustomerForm({ action, onSuccess }: CustomerFormProps) {
 
                     <div className="pt-2">
                         <SubmitButton label="Create Customer"
-                            className="bg-action hover:bg-action rounded-xl w-auto h-11 mt-4 px-4 ml-auto text-white"
-                            Icon={ArrowRight} />
+                            className="bg-action hover:bg-action rounded-xl w-auto h-11 mt-4 px-2 ml-auto max-sm:mt-0! max-sm:mb-4 max-sm:text-sm text-white"
+                            Icon={PlusIcon} />
                     </div>
                 </form>
             </CardContent>

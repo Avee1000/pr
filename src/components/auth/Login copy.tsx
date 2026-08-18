@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { signIn, type AuthFormState } from "@/app/(auth)/actions";
+import { signIn, type AuthFormState } from "@/app/(marketing)/(auth)/actions";
 import { LogIn, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { SubmitButton } from "@/components/global/SubmitButton";
 import { Input } from "@/components/ui/input";

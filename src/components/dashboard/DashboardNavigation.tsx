@@ -1,10 +1,11 @@
-'use client'
+'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useMediaQuery from '../global/useMediaQuery';
 import { ChevronDown, Hammer, LayoutDashboard, ListTodo, Percent, Plus, Users, WalletCards, SidebarOpen, SidebarClose } from 'lucide-react';
+import { Tooltip } from '../global/Tooltip';
 
 type NavLeaf = {
     href: string;
@@ -49,66 +50,77 @@ export default function OrderNavLinks() {
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
+        if (!isOpen) {
+            setIsCostsOpen(false);
+        }
         if (pathname.startsWith('/dashboard/costs')) {
             setIsCostsOpen(true);
         }
-    }, [pathname]);
+    }, [pathname, isOpen]);
 
     if (isMobile) {
-        return 
+        return null;
     }
 
     return (
         <aside
-            className={`h-auto transition-[width] hidden sm:block duration-300 ease-in-out select-none pt-1 pl-1 pb-1  ${
-                isOpen ? "sm:w-50 lg:w-60" : "w-16"
+            className={`h-auto transition-[width] hidden sm:block duration-300 ease-in-out select-none ${
+                isOpen ? 'sm:w-53 lg:w-63' : 'w-16'
             }`}
         >
-            <section
-                style={{ backgroundColor: "#1A1A1A" }}
-                className="flex flex-col h-full rounded-md text-white shadow-md overflow-hidden"
-            >
-                {/* Toggle Button */}
-                <div className={`flex items-center justify-end h-14 px-2.5 border-b border-muted-foreground/50`}>
-                    <button
-                        onClick={() => setIsOpen((prev) => !prev)}
-                        aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-                        className="relative size-10 rounded-xl text-white/80 hover:bg-white/10 hover:text-white transition-colors duration-200 flex items-center justify-center shrink-0 focus:outline-none"
-                    >
-                        {isOpen ? <SidebarClose className="size-5" /> : <SidebarOpen className="size-5" />}
-                    </button>
+            <section className="flex flex-col h-full overflow-hidden">
+                {/* Toggle Button Container */}
+                <div className={`flex items-center w-full h-14 px-3 mb-4 justify-end ${isOpen ? '' : 'justify-center'}`}>
+                    <Tooltip show={true} content={isOpen ? 'Collapse' : 'Expand'}>
+                        <button
+                            type="button"
+                            aria-expanded={isOpen}
+                            onClick={() => setIsOpen((prev) => !prev)}
+                            aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+                            className="size-10 rounded-xl text-ink dark:text-white hover:bg-muted-foreground/20 transition-colors duration-200 flex items-center justify-center shrink-0 focus:outline-none"
+                        >
+                            {isOpen ? <SidebarClose className="size-5" /> : <SidebarOpen className="size-5" />}
+                        </button>
+                    </Tooltip>
                 </div>
 
                 {/* Navigation Items */}
-                <nav className="flex-1 overflow-y-auto overflow-x-hidden p-2">
+                <nav className="flex-1 flex flex-col transition-all duration-300 ease-in-out overflow-y-auto overflow-x-hidden p-2 gap-1.5">
                     <ul className="flex flex-col gap-1.5">
                         {navItems.map((item) => {
                             if (!isGroup(item)) {
-                                const isActive = pathname === item.href || (item.href === "/dashboard/customers" && pathname.startsWith("/dashboard/customers/edit/") || (item.href === "/dashboard/orders" && pathname.startsWith("/dashboard/orders/board")));
+                                const isActive = pathname === item.href || 
+                                    (item.href === "/dashboard/customers" && pathname.startsWith("/dashboard/customers/edit/")) || 
+                                    (item.href === "/dashboard/orders" && pathname.startsWith("/dashboard/orders/board"));
                                 const IconComponent = item.icon;
+
                                 return (
                                     <li key={item.href} className="w-full">
-                                        <Link
-                                            href={item.href}
-                                            title={!isOpen ? item.label : undefined}
-                                            aria-current={isActive ? 'page' : undefined}
-                                            className={`relative flex items-center h-11 px-3 rounded-xl transition-colors duration-200 overflow-hidden ${
-                                                isActive
-                                                    ? 'bg-button-bg text-[#1A1A1A] shadow-sm'
-                                                    : 'text-white/80 hover:bg-white/10 hover:text-white'
-                                            }`}
-                                        >
-                                            <div className="absolute left-3 flex items-center justify-center size-5 shrink-0">
-                                                <IconComponent className="size-5" />
-                                            </div>
-                                            <div
-                                                className={`pl-8 transition-opacity duration-300 whitespace-nowrap text-sm  ${
-                                                    isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                                        <Tooltip show={!isOpen} content={item.label}>
+                                            <Link
+                                                href={item.href}
+                                                aria-current={isActive ? 'page' : undefined}
+                                                tabIndex={!isOpen && isMobile ? -1 : 0}
+                                                className={`relative flex items-center h-10 px-3 rounded-xl transition-colors duration-200 overflow-hidden ${
+                                                    isActive
+                                                        ? 'bg-brand text-ink shadow-sm font-medium'
+                                                        : 'text-ink dark:text-white hover:bg-muted-foreground/20 hover:text-black'
                                                 }`}
                                             >
-                                                {item.label}
-                                            </div>
-                                        </Link>
+                                                <div className="absolute left-3.5 flex items-center justify-center size-5 shrink-0">
+                                                    <IconComponent className="size-5" />
+                                                </div>
+                                                <div
+                                                    title={item.label}
+                                                    aria-label={item.label}
+                                                    className={`pl-10 transition-opacity duration-300 whitespace-nowrap text-sm ${
+                                                        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                                                    }`}
+                                                >
+                                                    {item.label}
+                                                </div>
+                                            </Link>
+                                        </Tooltip>
                                     </li>
                                 );
                             }
@@ -118,46 +130,49 @@ export default function OrderNavLinks() {
 
                             return (
                                 <li key={item.basePath} className="w-full">
-                                    <button
-                                        type="button"
-                                        title={!isOpen ? item.label : undefined}
-                                        aria-expanded={isCostsOpen}
-                                        onClick={() => {
-                                            if (!isOpen) {
-                                                setIsOpen(true);
-                                                setIsCostsOpen(true);
-                                            } else {
-                                                setIsCostsOpen((prev) => !prev);
-                                            }
-                                        }}
-                                        className={`relative flex items-center justify-between h-11 px-3 w-full rounded-xl transition-colors duration-200 overflow-hidden ${
-                                            isGroupActive
-                                                ? 'bg-button-bg text-[#1A1A1A] shadow-sm'
-                                                : 'text-white/80 hover:bg-white/10 hover:text-white'
-                                        }`}
-                                    >
-                                        <div className="absolute left-3 flex items-center justify-center size-5 shrink-0">
-                                            <ParentIcon className="size-5" />
-                                        </div>
-                                        <div
-                                            className={`pl-8 min-w-0 text-ellipsis truncate transition-opacity duration-200 whitespace-nowrap sm:text-xs lg:text-sm ${
-                                                isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                                    <Tooltip show={!isOpen} content={item.label}>
+                                        <button
+                                            type="button"
+                                            aria-expanded={isCostsOpen}
+                                            onClick={() => {
+                                                if (!isOpen) {
+                                                    setIsOpen(true);
+                                                    setIsCostsOpen(true);
+                                                } else {
+                                                    setIsCostsOpen((prev) => !prev);
+                                                }
+                                            }}
+                                            className={`relative flex items-center justify-between h-10 px-3 w-full rounded-xl transition-colors duration-200 overflow-hidden ${
+                                                isGroupActive
+                                                    ? 'bg-brand text-ink shadow-sm font-medium'
+                                                    : 'text-ink dark:text-white hover:bg-muted-foreground/20 hover:text-black'
                                             }`}
                                         >
-                                            {item.label}
-                                        </div>
-                                        <div
-                                            className={`transition-all duration-200 ${
-                                                isOpen ? "opacity-100 scale-100" : "opacity-0 scale-75 pointer-events-none"
-                                            }`}
-                                        >
-                                            <ChevronDown
-                                                className={`size-4 shrink-0 transition-transform duration-300 ${
-                                                    isCostsOpen ? 'rotate-180' : ''
+                                            <div className="absolute left-3.5 flex items-center justify-center size-5 shrink-0">
+                                                <ParentIcon className="size-5" />
+                                            </div>
+                                            <div
+                                                title={item.label}
+                                                aria-label={item.label}
+                                                className={`pl-10 min-w-0 text-ellipsis truncate transition-opacity duration-200 whitespace-nowrap sm:text-sm lg:text-sm ${
+                                                    isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                                                 }`}
-                                            />
-                                        </div>
-                                    </button>
+                                            >
+                                                {item.label}
+                                            </div>
+                                            <div
+                                                className={`transition-all duration-200 ${
+                                                    isOpen ? "opacity-100 scale-100" : "opacity-0 scale-75 pointer-events-none"
+                                                }`}
+                                            >
+                                                <ChevronDown
+                                                    className={`size-4 shrink-0 transition-transform duration-300 ${
+                                                        isCostsOpen ? 'rotate-180' : ''
+                                                    }`}
+                                                />
+                                            </div>
+                                        </button>
+                                    </Tooltip>
 
                                     {/* Submenu Accordion */}
                                     <div
@@ -166,7 +181,7 @@ export default function OrderNavLinks() {
                                         }`}
                                     >
                                         <div className="overflow-hidden">
-                                            <ul className="mt-1 flex flex-col gap-1 pl-3 border-l border-white/10 ml-5">
+                                            <ul className="mt-1 flex flex-col gap-1 pl-1 border-l border-white/10 ml-2.5">
                                                 {item.children.map((child) => {
                                                     const isChildActive = pathname === child.href;
                                                     const ChildIcon = child.icon;
@@ -175,10 +190,11 @@ export default function OrderNavLinks() {
                                                             <Link
                                                                 href={child.href}
                                                                 aria-current={isChildActive ? 'page' : undefined}
-                                                                className={`flex items-center gap-2.5 px-3 py-2 w-full text-xs rounded-lg transition-colors duration-200 whitespace-nowrap ${
+                                                                tabIndex={!(isCostsOpen && isOpen) ? -1 : 0}
+                                                                className={`flex items-center gap-2.5 px-2 py-2 w-full text-xs rounded-lg transition-colors duration-200 whitespace-nowrap ${
                                                                     isChildActive
-                                                                        ? 'bg-button-bg text-[#1A1A1A] shadow-sm'
-                                                                        : 'text-white/80 hover:bg-white/10 hover:text-white'
+                                                                        ? 'bg-brand text-ink shadow-sm font-medium'
+                                                                        : 'text-ink dark:text-white hover:bg-muted-foreground/20 hover:text-black'
                                                                 }`}
                                                             >
                                                                 <ChildIcon className="size-4 shrink-0" />

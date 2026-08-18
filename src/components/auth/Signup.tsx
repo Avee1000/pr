@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState, useEffect } from "react";
-import { signUp, type AuthFormState } from "@/app/(auth)/actions";
+import { signUp, type AuthFormState } from "@/app/(marketing)/(auth)/actions";
 import { SubmitButton } from "@/components/global/SubmitButton";
 import { ArrowRight, AlertCircle, Eye, EyeOff, CheckCircle, Code } from "lucide-react";
 import { Input } from "@/components/ui/input";
