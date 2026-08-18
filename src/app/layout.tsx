@@ -10,6 +10,8 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import TopLoader from "@/components/global/TopLoader";
 import { RootProviders } from "@/components/providers/ProfileProvider";
 import ReactQueryProvider from "@/components/providers/ReactQueryProvider";
+import  { Toaster as ReactToaster } from 'react-hot-toast';
+import { FiLoader } from "react-icons/fi";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -71,12 +73,13 @@ export default function RootLayout({
                 <main className="flex-1">{children}</main>
                 <Toaster
                   icons={{
-                    loading: <Loader className="size-5 animate-spin" />,
+                    loading: <FiLoader className="size-4 animate-spin" />,
                   }}
                   richColors
                   duration={4000}
                   position="top-center"
-                />
+                />                
+                <ReactToaster/>
                 <Footer />
               </div>
             </RootProviders>

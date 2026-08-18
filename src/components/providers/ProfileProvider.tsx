@@ -2,6 +2,7 @@ import React from "react";
 import { createClient } from "@/lib/supabase/server";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { CurrencyProvider } from "@/components/context/currencyContext";
+import type { Profile } from "@/lib/types/profileTypes";
 
 interface ProfilePreferences {
   currency: string;
@@ -16,29 +17,29 @@ export async function RootProviders({
 }) {
   const supabase = await createClient();
 
-  // 1. Single Auth Call on the Server
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let initialProfile: ProfilePreferences | null = null;
+  let initialProfile: Profile | null = null;
 
-  // 2. Fetch profile only if user exists
   if (user) {
     const { data } = await supabase
       .from("profiles")
-      .select("currency, country, locale")
+      .select(
+        "*",
+      )
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (data) {
-      initialProfile = data as ProfilePreferences;
+      initialProfile = data as Profile;
     }
   }
-
-  // 3. Nest Client Providers with pre-hydrated server state
+  
   return (
-    <AuthProvider initialUser={user}>
+    <AuthProvider initialUser={user} initialProfile={initialProfile}>
       <CurrencyProvider initialProfile={initialProfile}>
         {children}
       </CurrencyProvider>

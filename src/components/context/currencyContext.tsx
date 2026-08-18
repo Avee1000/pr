@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react"
 import { SUPPORTED_CURRENCIES } from "@/data/currencies"
 import { useQuery } from '@tanstack/react-query'
-import { getBaseUrl } from "@/utils/url"
+import { useAuth } from "@/components/providers/AuthProvider"
 
 interface ProfilePreferences {
   currency: string;
@@ -33,20 +33,25 @@ async function fetchRates() {
 }
 
 export function CurrencyProvider({ children, initialProfile }: { children: React.ReactNode; initialProfile: ProfilePreferences | null}) {
-    const [currency, setCurrency] = useState<string>(initialProfile?.currency ?? "USD")
+    const { profile } = useAuth()
+    const [currency, setCurrency] = useState<string>(initialProfile?.currency ?? profile?.currency ?? "USD")
     const [rates, setRates] = useState<Record<string, number>>({})
-    const [country, setCountry] = useState<string>(initialProfile?.country ?? "EUR")
+    const [country, setCountry] = useState<string>(initialProfile?.country ?? profile?.country ?? "US")
 
     useEffect(() => {
-        if (initialProfile?.currency) {
+        if (profile?.currency) {
+            setCurrency(profile.currency)
+        } else if (initialProfile?.currency) {
             setCurrency(initialProfile.currency)
         }
-        if (initialProfile?.country) {
+
+        if (profile?.country) {
+            setCountry(profile.country)
+        } else if (initialProfile?.country) {
             setCountry(initialProfile.country)
         }
-    }, [initialProfile])
+    }, [initialProfile, profile])
 
-    // Let TanStack Query handle state, caching, loading, and error handling
     const { data, isLoading: loading, isError, error } = useQuery({
         queryKey: ['currency-rates'],
         queryFn: fetchRates,
@@ -56,19 +61,15 @@ export function CurrencyProvider({ children, initialProfile }: { children: React
             setRates(data.rates)
         }
     }, [data])
-    // Show toast error when fetching fails
     useEffect(() => {
         if (isError) {
-            // toast.error("Failed to load exchange rates")
             console.error(error)
         }
     }, [isError, error])
 
-    // Corrected object property lookup with fallback
     const currencySymbol =
         SUPPORTED_CURRENCIES.find((item) => item.code === (currency || "USD"))?.symbol || "$"
 
-    // Format function matching the interface return type
     const formatPrice = (amountInUSD: number): string => {
         const rate = rates[currency] || 1
         const converted = amountInUSD * rate

@@ -5,7 +5,8 @@ import { useAuth } from '@/components/providers/AuthProvider';
 import { User } from '@supabase/supabase-js';
 import { LoadingState } from '@/components/feedback/loading-state';
 // import { getDeviceModel } from '@/components/global/DeviceInformation';
-// Types
+import { DeviceAndSessionsSkeleton } from '@/components/accounts/audit-trail/DeviceAndSessionsSkeleton'
+
 export interface DeviceModelHints {
     brandModel: string;
     platform: string;
@@ -66,7 +67,7 @@ export async function getDeviceModel(): Promise<DeviceModelHints | null> {
 
 async function getGeoLocation() {
     const CACHE_KEY = 'cached_user_geo';
-    
+
     // 1. Check local session cache first
     const cached = sessionStorage.getItem(CACHE_KEY);
     if (cached) {
@@ -87,7 +88,7 @@ async function getGeoLocation() {
                 location: geo.city && geo.country_name
                     ? `${geo.city}, ${geo.country_name}`
                     : geo.country_name || 'Unknown'
-            }; 
+            };
             console.log('Using ipapi')
             sessionStorage.setItem(CACHE_KEY, JSON.stringify(locationData));
             return locationData;
@@ -143,40 +144,44 @@ export default function DeviceAndSessionsPage({
     const [deviceProfile, setDeviceProfile] = useState<Partial<DeviceHardwareProfile>>({});
     const [loading, setLoading] = useState<boolean>(true);
     const [sessions, setSessions] = useState<UserSession[]>([]);
-    const { user } = useAuth();
+    const { user, isLoadingProfile: authLoading } = useAuth();
 
-    if (!user) {
-        return null;
+    useEffect(() => {
+        // Only run data fetching once the user object is actually available
+        if (!user) return;
+
+        async function loadPageData() {
+            try {
+                const [currentSession, highEntropy] = await Promise.all([
+                    getCurrentSession(user),
+                    getDeviceModel()
+                ]);
+
+                const hardware = getHardwareCapacity();
+
+                setSessions(currentSession);
+                setDeviceProfile({
+                    deviceModel: highEntropy?.brandModel || 'Standard Web Client',
+                    platform: highEntropy?.platform || navigator.platform,
+                    architecture: highEntropy?.architecture || 'Standard Architecture',
+                    cpuCores: hardware.cpuCores,
+                    ram: hardware.deviceMemoryRAM,
+                    screenResolution: `${window.screen.width}x${window.screen.height} @ ${window.devicePixelRatio}x DPI`
+                });
+            } catch (error) {
+                console.error("Error loading device and session specs:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        loadPageData();
+    }, [user]);
+
+    // 2. Show the skeleton if auth is initializing OR page telemetry is still loading
+    if (authLoading || loading) {
+        return <DeviceAndSessionsSkeleton />;
     }
-
-    useEffect(() => {
-        async function loadSessionData() {
-            const currentSession = await getCurrentSession(user);
-            setSessions(currentSession);
-        }
-
-        loadSessionData();
-    }, []);
-
-
-    useEffect(() => {
-        async function loadHardwareSpecs() {
-            const highEntropy = await getDeviceModel();
-            const hardware = getHardwareCapacity();
-
-            setDeviceProfile({
-                deviceModel: highEntropy?.brandModel || 'Standard Web Client',
-                platform: highEntropy?.platform || navigator.platform,
-                architecture: highEntropy?.architecture || 'Standard Architecture',
-                cpuCores: hardware.cpuCores,
-                ram: hardware.deviceMemoryRAM,
-                screenResolution: `${window.screen.width}x${window.screen.height} @ ${window.devicePixelRatio}x DPI`
-            });
-            setLoading(false);
-        }
-
-        loadHardwareSpecs();
-    }, []);
 
     return (
         <div className="flex flex-col gap-6 mx-auto py-6 font-sans text-ink dark:text-zinc-200">
@@ -201,7 +206,7 @@ export default function DeviceAndSessionsPage({
 
                 {loading ? (
                     <div className="py-8 text-center text-sm text-ink dark:text-muted-foreground animate-pulse">
-                        <LoadingState iconOnly={false} description='Gathering hardware metrics...' size='lg'/>
+                        {/* <LoadingState iconOnly={false} description='Gathering hardware metrics...' size='lg' /> */}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-6">

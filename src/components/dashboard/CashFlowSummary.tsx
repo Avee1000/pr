@@ -22,7 +22,6 @@ export default async function CashFlowSummary() {
           <CardTitle>Revenue this month</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Replace hardcoded $ with FormattedPrice */}
           <FormattedPrice className="text-2xl font-bold tabular-nums text-ink dark:text-white" amountInUSD={summary.monthlyRevenue} />
           <p className="text-sm text-muted-foreground">From orders paid this month.</p>
         </CardContent>
@@ -33,7 +32,6 @@ export default async function CashFlowSummary() {
           <CardTitle>Receivables</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Replace hardcoded $ with FormattedPrice */}
           <FormattedPrice className="text-2xl font-bold tabular-nums text-ink dark:text-white" amountInUSD={summary.receivablesTotal} />
           <p className="text-sm text-muted-foreground">
             {summary.receivablesCount === 0
@@ -48,7 +46,6 @@ export default async function CashFlowSummary() {
           <CardTitle>Overdue payments</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Replace hardcoded $ with FormattedPrice */}
           <FormattedPrice className={`text-2xl font-bold tabular-nums ${summary.overdueCount > 0 ? "text-red-600 dark:text-red-400" : "text-ink dark:text-white"
             }`} amountInUSD={summary.overdueTotal} />
           <p className="text-sm text-muted-foreground">

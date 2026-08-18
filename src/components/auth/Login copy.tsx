@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState, useEffect, useRef } from "react"
+import { useActionState, useState } from "react";
 import { signIn, type AuthFormState } from "@/app/(auth)/actions";
-import { LogIn, AlertCircle, Eye, EyeOff, Loader } from "lucide-react";
+import { LogIn, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { SubmitButton } from "@/components/global/SubmitButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,58 +14,25 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { toast } from 'sonner';
 
 const initialState: AuthFormState = {};
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [state, formAction, isPending] = useActionState(signIn, initialState);
+  const [state, formAction] = useActionState(signIn, initialState);
 
   const fieldErrors = state.errors;
   const rootError = fieldErrors?._form?.[0];
 
-
-  // Track previous pending state to detect when the action transitions from pending to finished
-  const prevIsPendingRef = useRef(isPending);
-
-  useEffect(() => {
-    const wasPending = prevIsPendingRef.current;
-    prevIsPendingRef.current = isPending;
-
-    if (wasPending && !isPending) {
-      const hasErrors = fieldErrors && Object.keys(fieldErrors).length > 0;
-
-      if (!hasErrors) {
-        toast.success("Successfully signed in!", {
-          description: "Redirecting to your workspace...",
-        });
-      } else if (rootError) {
-        toast.error(rootError, {
-          classNames: { error: "!bg-background !text-foreground !border-border" }
-        });
-      }
-    }
-  }, [isPending, fieldErrors, rootError]);
-
-  useEffect(() => {
-    let loadingToastId: string | number | undefined;
-    if (isPending) {
-      loadingToastId = toast.loading("Signing in...");
-    }
-    return () => {
-      if (loadingToastId) toast.dismiss(loadingToastId);
-    };
-  }, [isPending]);
-
   return (
-    <Card>
+    <Card >
       <CardHeader>
         <CardTitle className="font-heading text-2xl font-bold">Welcome back</CardTitle>
         <CardDescription>Sign in to your PriceRight workspace.</CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="flex flex-col gap-6" noValidate>
+          {/* Root / Global Error Banner */}
           {rootError && (
             <div
               role="alert"
@@ -111,8 +78,9 @@ export function LoginForm() {
                 required
                 aria-invalid={Boolean(fieldErrors?.password)}
                 aria-describedby={fieldErrors?.password ? "password-error" : undefined}
-                className={`pr-10 ${fieldErrors?.password ? "border-destructive focus-visible:ring-destructive" : ""
-                  }`}
+                className={`pr-10 ${
+                  fieldErrors?.password ? "border-destructive focus-visible:ring-destructive" : ""
+                }`}
               />
               <button
                 type="button"

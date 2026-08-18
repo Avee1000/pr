@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <main className="mx-auto sm:min-h-screen max-sm:h-dvh flex w-full max-w-md flex-1 flex-col justify-center px-4 sm:py-12">
-      <div className="absolute top-0 left-0 m-4">
+      <div className="absolute top-0 left-0 m-4 sm:hidden">
         <Link href="/" className="flex items-center gap-1 text-lg font-semibold text-ink dark:text-white">
           <Image
             src="/android-chrome-512x512.png"

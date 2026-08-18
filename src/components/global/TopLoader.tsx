@@ -88,7 +88,7 @@ function TopLoaderComponent() {
 
   return (
     <div
-      className="absolute h-0.5 z-500 bg-ink pointer-events-none transition-all duration-300 ease-out"
+      className="absolute h-0.5 z-10 bg-ink pointer-events-none transition-all duration-300 ease-out"
       style={{
         width: `${progress}%`,
         opacity: progress === 100 ? 0 : 1,

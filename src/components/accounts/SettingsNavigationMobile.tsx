@@ -104,6 +104,10 @@ export default function SettingsNavLinksMobile() {
         setIsOpen(false);
     }, [pathname]);
 
+    if (!isMobile) {
+        return null;
+    }
+
     return (
         <Drawer open={isOpen} onOpenChange={setIsOpen} showSwipeHandle>
             <DrawerTrigger render={
@@ -117,14 +121,14 @@ export default function SettingsNavLinksMobile() {
                 </Button>
             }>
             </DrawerTrigger>
-            <DrawerContent className="max-h-[85vh] h-[65dvh]">
+            <DrawerContent className="max-h-[90%] h-[80%]">
                 <DrawerHeader className="text-left">
                     <DrawerTitle>Navigation Menu</DrawerTitle>
                     <DrawerDescription>Access your account and system settings.</DrawerDescription>
                 </DrawerHeader>
 
                 {/* Navigation Items */}
-                <nav className="flex-1 flex flex-col gap-6 overflow-y-auto px-4 py-2">
+                <nav className="flex-1 flex flex-col gap-6 overflow-y-auto px-4 py-2 mt-5">
                     {settingsNavSections.map((section) => (
                         <div key={section.title} className="flex flex-col gap-1.5">
                             <div className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -201,7 +205,7 @@ export default function SettingsNavLinksMobile() {
                                                                     href={child.href}
                                                                     aria-current={isChildActive ? 'page' : undefined}
                                                                     tabIndex={!isPricingOpen ? -1 : 0}
-                                                                    className={`flex items-center gap-2.5 px-3 py-2.5 w-full text-xs rounded-xl transition-colors duration-200 ${
+                                                                    className={`flex items-center gap-2.5 px-3 py-2.5 w-full rounded-xl transition-colors duration-200 ${
                                                                         isChildActive
                                                                             ? 'bg-brand text-ink shadow-sm font-medium'
                                                                             : 'hover:bg-muted-foreground/20 hover:text-black dark:text-white'

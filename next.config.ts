@@ -28,6 +28,16 @@ const nextConfig: NextConfig = {
     }
     return [];
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'fdskrduaeipkvxxkdzwx.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

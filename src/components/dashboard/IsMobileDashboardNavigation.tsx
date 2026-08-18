@@ -109,7 +109,7 @@ export default function IsMobileOrderNavLinks({ showBlockButton }: NavigationArg
                 </Button>
             }>
             </DrawerTrigger>
-            <DrawerContent className="max-h-[85vh] h-[65dvh]">
+            <DrawerContent className="max-h-[90%] h-[80%]">
                 <DrawerHeader className="text-left">
                     <DrawerTitle>Dashboard Navigation</DrawerTitle>
                     <DrawerDescription>Access your overview, Customers, orders, and cost settings.</DrawerDescription>
@@ -184,7 +184,7 @@ export default function IsMobileOrderNavLinks({ showBlockButton }: NavigationArg
                                                             href={child.href}
                                                             aria-current={isChildActive ? 'page' : undefined}
                                                             tabIndex={!isCostsOpen ? -1 : 0}
-                                                            className={`flex items-center gap-2.5 px-3 py-2.5 w-full text-xs rounded-lg transition-colors duration-200 ${isChildActive
+                                                            className={`flex items-center gap-2.5 px-3 py-2.5 w-full rounded-lg transition-colors duration-200 ${isChildActive
                                                                 ? 'bg-brand text-ink shadow-sm font-medium'
                                                                 : 'hover:bg-muted-foreground/20 hover:text-black dark:text-white'
                                                                 }`}
