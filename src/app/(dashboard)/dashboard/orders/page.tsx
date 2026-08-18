@@ -5,10 +5,10 @@ import Information from "@/components/global/Information";
 
 export default function OrderPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-      <div className="flex flex-row justify-between w-full">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-sm:px-5 max-sm:py-5">
+      <div className="flex flex-row justify-between w-full max-sm:text-sm">
         <div className="mb-8 max-sm:ml-2">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+          <div className="flex items-center gap-2 max-sm:text-xs! sm:text-sm text-muted-foreground mb-2">
             <span>
               <Link href="/dashboard" className="underline underline-offset-2">
                 Dashboard
@@ -17,7 +17,7 @@ export default function OrderPage() {
             <span className="text-border">/</span>
             <span className="text-foreground font-medium">Orders</span>
           </div>
-          <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground">
+          <h1 className="font-heading text-3xl max-sm:text-2xl font-bold tracking-tight text-foreground">
             View & Adjust orders <Information detail={"While owners can edit price and payment status, customers will always have the most absolute control over their orders with the most accurate pricing and status information irrespective of future edits made by you or your organization."} />
           </h1>
           <p className="text-muted-foreground">

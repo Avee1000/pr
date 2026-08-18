@@ -121,7 +121,7 @@ export default function SettingsNavLinksMobile() {
                 </Button>
             }>
             </DrawerTrigger>
-            <DrawerContent className="max-h-[90%] h-[80%]">
+            <DrawerContent className="max-h-[95%] h-auto">
                 <DrawerHeader className="text-left">
                     <DrawerTitle>Navigation Menu</DrawerTitle>
                     <DrawerDescription>Access your account and system settings.</DrawerDescription>

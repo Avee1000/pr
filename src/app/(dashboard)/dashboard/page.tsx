@@ -17,7 +17,7 @@ export default async function OrdersDashboard() {
   } = await supabase.auth.getUser();
 
   return (
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="sm:p-8 sm:max-w-7xl mx-auto max-sm:px-5 max-sm:py-5">
         <div>
           <h1 className="text-2xl font-bold font-heading text-ink dark:text-white">
             {/* If full_name is undefined, it will pass "Guest" instead */}

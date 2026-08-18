@@ -128,12 +128,10 @@ export function PhotoUploadEditForm({ onClose }: PhotoUploadEditFormProps) {
     };
 
 
-    // 1. Handle file selection & validation (Client-side constraints)
     const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0]
 
-            // Strict validation: max 5MB, accepted types
             if (file.size > 5 * 1024 * 1024) {
                 toast.error("File size exceeds 5MB limit. Try again")
                 return

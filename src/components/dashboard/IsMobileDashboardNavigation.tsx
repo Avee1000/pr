@@ -109,7 +109,7 @@ export default function IsMobileOrderNavLinks({ showBlockButton }: NavigationArg
                 </Button>
             }>
             </DrawerTrigger>
-            <DrawerContent className="max-h-[90%] h-[80%]">
+            <DrawerContent className="max-h-[95%] h-auto">
                 <DrawerHeader className="text-left">
                     <DrawerTitle>Dashboard Navigation</DrawerTitle>
                     <DrawerDescription>Access your overview, Customers, orders, and cost settings.</DrawerDescription>

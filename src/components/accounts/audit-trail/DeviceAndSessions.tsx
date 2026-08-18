@@ -184,7 +184,7 @@ export default function DeviceAndSessionsPage({
     }
 
     return (
-        <div className="flex flex-col gap-6 mx-auto py-6 font-sans text-ink dark:text-zinc-200">
+        <div className="flex flex-col gap-6 mx-auto py-3 font-sans text-ink dark:text-zinc-200">
             {/* Page Header */}
             <div>
                 <h1 className="text-2xl font-medium text-ink dark:text-zinc-100">Device Specifications & Active Sessions</h1>

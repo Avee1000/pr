@@ -22,7 +22,6 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen w-full overflow-x-hidden text-base bg-gray-100 dark:bg-ink ">
       <div className="flex flex-col sm:flex-row w-full min-w-0">
-        {/* Desktop Nav: Hides on mobile, shows on 'sm' screens and up */}
         <div className="hidden sm:block">
           <SettingsNavLinks />
         </div>
