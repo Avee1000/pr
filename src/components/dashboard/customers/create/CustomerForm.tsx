@@ -13,7 +13,8 @@ import {
     CardDescription,
     CardContent,
 } from "@/components/ui/card";
-import { SubmitButton } from "../../../global/SubmitButton"; // Adjust path if needed based on your file structure
+import { SubmitButton } from "../../../global/SubmitButton"; 
+import { BiSolidCheckCircle } from "react-icons/bi";
 
 const CustomerFormSchema = z.object({
     name: z
@@ -69,7 +70,9 @@ export default function CustomerForm({ action, onSuccess }: CustomerFormProps) {
 
     useEffect(() => {
         if (state?.success) {
-            toast.success(state.message || "Customer created successfully!");
+            toast(state.message || "Customer created successfully!", {
+                icon: <BiSolidCheckCircle className="size-5" />
+            });
             onSuccess?.()
             // router.refresh();
         } else if (state?.message && !state?.success) {

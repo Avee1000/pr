@@ -24,6 +24,9 @@ export function LoginForm() {
 
   const fieldErrors = state.errors;
   const rootError = fieldErrors?._form?.[0];
+  // if (!showPassword) {
+  //   toast.loading("Signing in...");
+  // }
 
 
   // Track previous pending state to detect when the action transitions from pending to finished
@@ -59,13 +62,13 @@ export function LoginForm() {
   }, [isPending]);
 
   return (
-    <Card>
+    <Card className="max-sm:border-0 max-sm:shadow-none max-sm:ring-0 max-sm:w-full  max-sm:outline-none max-sm:bg-transparent">
       <CardHeader>
         <CardTitle className="font-heading text-2xl font-bold">Welcome back</CardTitle>
         <CardDescription>Sign in to your PriceRight workspace.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="flex flex-col gap-6" noValidate>
+        <form action={formAction} className="flex flex-col gap-6  max-sm:space-y-2" noValidate>
           {rootError && (
             <div
               role="alert"

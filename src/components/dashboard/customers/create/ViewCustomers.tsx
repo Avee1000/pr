@@ -39,13 +39,13 @@ function CustomersContent({ customersPromise }: { customersPromise: Promise<Cust
     });
 
     return (
-        <div className="rounded-xl border border-ink/10 dark:border-muted-foreground/40 shadow-sm box-border flex flex-col overflow-hidden">
+        <div className="sm:rounded-xl sm:border sm:border-ink/10 sm:dark:border-muted-foreground/40 sm:shadow-sm box-border flex flex-col overflow-hidden">
             <div className="hidden md:block">
                 <DataTable columns={columns} data={customers} />
             </div>
 
-            <div className="block md:hidden p-4 space-y-4">
-                <div className="w-full">
+            <div className="block md:hidden sm:p-4 space-y-4">
+                <div className="w-full hidden">
                     <Input
                         placeholder="Filter name, email, country..."
                         value={mobileSearchQuery}

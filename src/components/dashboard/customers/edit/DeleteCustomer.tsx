@@ -13,6 +13,9 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button";
+import { BiSolidCheckCircle } from "react-icons/bi";
+
+
 interface DeleteProps {
     label?: string;
     id: string | number;
@@ -39,6 +42,9 @@ export default function Delete({ id, label }: DeleteProps) {
                 loading: "Deleting Customer...",
                 success: "Customer deleted successfully!",
                 error: (err) => err.message || "Failed to delete Customer. Please try again.",
+                classNames: {
+                    success: "!bg-background !text-foreground !border-border",
+                }
             });
         } catch (error) {
             console.error(error);

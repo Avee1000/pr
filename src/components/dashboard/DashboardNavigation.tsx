@@ -101,14 +101,14 @@ export default function OrderNavLinks() {
                                                 href={item.href}
                                                 aria-current={isActive ? 'page' : undefined}
                                                 tabIndex={!isOpen && isMobile ? -1 : 0}
-                                                className={`relative flex items-center h-10 px-3 rounded-xl transition-colors duration-200 overflow-hidden ${
+                                                className={`relative flex items-center group h-10 px-3 rounded-xl transition-colors duration-200 overflow-hidden ${
                                                     isActive
                                                         ? 'bg-brand text-ink shadow-sm font-medium'
                                                         : 'text-ink dark:text-white hover:bg-muted-foreground/20 hover:text-black'
                                                 }`}
                                             >
                                                 <div className="absolute left-3.5 flex items-center justify-center size-5 shrink-0">
-                                                    <IconComponent className="size-5" />
+                                                    <IconComponent className="size-5 group-hover:fill-ink" />
                                                 </div>
                                                 <div
                                                     title={item.label}
@@ -142,14 +142,14 @@ export default function OrderNavLinks() {
                                                     setIsCostsOpen((prev) => !prev);
                                                 }
                                             }}
-                                            className={`relative flex items-center justify-between h-10 px-3 w-full rounded-xl transition-colors duration-200 overflow-hidden ${
+                                            className={`relative flex group items-center justify-between h-10 px-3 w-full rounded-xl transition-colors duration-200 overflow-hidden ${
                                                 isGroupActive
                                                     ? 'bg-brand text-ink shadow-sm font-medium'
                                                     : 'text-ink dark:text-white hover:bg-muted-foreground/20 hover:text-black'
                                             }`}
                                         >
                                             <div className="absolute left-3.5 flex items-center justify-center size-5 shrink-0">
-                                                <ParentIcon className="size-5" />
+                                                <ParentIcon className="size-5 group-hover:filter group-hover:fill-ink group-hover:invert-0" />
                                             </div>
                                             <div
                                                 title={item.label}

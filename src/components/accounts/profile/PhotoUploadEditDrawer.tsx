@@ -82,7 +82,7 @@ export function DrawerDialogDemo({ className, buttonClassName, drawerClassName }
                     />
                 }
             />
-            <DrawerContent className={cn(drawerClassName, "min-h-[40%] max-h-[60%]")}>
+            <DrawerContent className={cn(drawerClassName, "min-h-[60%] max-h-full h-auto")}>
                 <DrawerHeader className="text-left">
                     <DrawerTitle>Edit profile</DrawerTitle>
                     <DrawerDescription>

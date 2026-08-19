@@ -92,7 +92,7 @@ export function SignUpForm() {
     };
 
     return (
-        <Card className="w-lg mx-auto">
+        <Card className="w-lg mx-auto max-sm:ring-0 max-sm:border-none! max-sm:outline-none! max-sm:shadow-none max-sm:w-full max-sm:bg-transparent">
             <CardHeader>
                 <CardTitle className="font-heading text-2xl font-bold">Create your account</CardTitle>
                 <CardDescription>
@@ -100,7 +100,7 @@ export function SignUpForm() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <form action={formAction} className="flex flex-col gap-6" noValidate>
+                <form action={formAction} className="flex flex-col gap-6 max-sm:my-3" noValidate>
                     {/* Root / Global Error Banner */}
                     {rootError && (
                         <div

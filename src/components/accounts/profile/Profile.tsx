@@ -70,7 +70,7 @@ export default function ProfileInformation() {
                 </div>
 
                 <div className="flex flex-col min-w-0">
-                    <h2 className="text-2xl font-medium text-ink dark:text-white truncate">
+                    <h2 className="text-2xl max-sm:text-xl max-sm:wrap-break-word font-medium text-ink dark:text-white sm:truncate">
                         {user?.user_metadata?.name ?? "Anonymous User"}
                     </h2>
                     <p className="text-sm text-muted-foreground">

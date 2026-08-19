@@ -271,6 +271,10 @@ html, body {
 
 @media (max-width: 768px) {
   html {
-    font-size: 12px !important; 
+    font-size: calc(100% - 3px) !important; 
+  }
+
+  [data-sonner-toaster] {
+    top: 65px !important;
   }
 }
