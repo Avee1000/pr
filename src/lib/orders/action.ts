@@ -3,6 +3,7 @@
 import { createClient } from "../supabase/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { redis } from "../redis/redis";
 
 const MaterialUsageSchema = z.object({
     material_cost_id: z.string().uuid("Invalid material selected."),
@@ -295,7 +296,18 @@ export async function selectAllOrders() {
         throw new Error("Unauthorized: User not logged in.");
     }
 
+    if (!redis.isOpen) await redis.connect();
+
     try {
+        const ordersCacheKey = `orders:${user.id}`;
+        const cachedData = await redis.get(ordersCacheKey);
+
+        if (cachedData) {
+            console.log("🟢")
+            return JSON.parse(cachedData);
+        }
+
+        console.log("🔴 select all orders");
         const { data, error } = await supabase
             .from('orders')
             .select(`
@@ -317,6 +329,8 @@ export async function selectAllOrders() {
                 customer: customers
             };
         });
+
+        await redis.set(ordersCacheKey, JSON.stringify(mappedData), { EX: 300});
         return mappedData;
     } catch (error) {
         console.error("Unexpected error:", error);
@@ -382,7 +396,7 @@ export async function deleteOrder(id: string | number) {
 }
 
 export async function updateOrder(id: string | number, prevState: OrderState, formData: FormData) {
-    const supabase = await createClient(); 
+    const supabase = await createClient();
     const parsed = OrderFormSchema.safeParse(getOrderData(formData));
 
     if (!parsed.success) {

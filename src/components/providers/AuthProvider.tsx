@@ -156,7 +156,7 @@ export function AuthProvider({
     }
     await supabase.auth.signOut();
     queryClient.removeQueries({ queryKey: ["profile"] });
-    // router.refresh();
+    router.replace("/");
   };
 
   return (

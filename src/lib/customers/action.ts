@@ -3,7 +3,7 @@
 import { createClient } from "../supabase/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { redirect } from "next/navigation";
+import { redis } from "@/lib/redis/redis"
 
 const CustomerFormSchema = z.object({
     name: z
@@ -99,10 +99,13 @@ export async function createCustomer(prevState: State, formData: FormData): Prom
                 country,
                 phone,
             });
+
         if (error) {
             console.error("Supabase insert error:", error);
             return { message: 'Database error: Failed to create customer.' };
         }
+        if (!redis.isOpen) await redis.connect();
+        await redis.del(`customers:${user.id}`);
         revalidatePath('/dashboard/customers');
         return { success: true, message: 'Customer created successfully!' };
     } catch (error) {
@@ -140,10 +143,15 @@ export async function updateCustomer(id: string | number, prevState: State, form
                 country,
                 phone,
             }).eq('id', id).eq('user_id', user.id);
+
         if (error) {
             console.error("Supabase insert error:", error);
             return { message: 'Database error: Failed to update customer.' };
         }
+
+        if (!redis.isOpen) await redis.connect();
+        await redis.del(`customers:${user.id}`);
+
         revalidatePath('/dashboard/customers');
         return { success: true, message: 'Customer updated successfully!' };
     } catch (error) {
@@ -169,13 +177,18 @@ export async function deleteCustomer(id: string | number) {
             .delete()
             .eq('id', id)
             .eq('user_id', user.id)
+
         if (error) {
             console.error("Supabase delete customer error:", error);
             return { message: 'Database error: Failed to delete customer.' };
         }
+
+        if (!redis.isOpen) await redis.connect();
+        await redis.del(`customers:${user.id}`);
+
         revalidatePath('/dashboard/customers');
         return { success: true, message: 'Customer deleted successfully!' };
-    }catch (error) {
+    } catch (error) {
         console.error("Unexpected error:", error);
         return {
             message: 'Database Error: Failed to delete customer.'
@@ -192,12 +205,28 @@ export async function selectAllCustomers() {
         throw new Error("Unauthorized: User not logged in.");
     }
 
+    const cacheKey = `customers:${user.id}`;
+
     try {
+        if (!redis.isOpen) await redis.connect();
+        const cachedData = await redis.get(cacheKey);
+
+        if (cachedData) {
+            console.log("🟢 [CACHE HIT]: Reading from Redis, skipping Supabase!");
+            return JSON.parse(cachedData);
+        }
+
+        console.log("🔴 [CACHE MISS]: Hitting Supabase database...");
         const { data, error } = await supabase
             .from('customers')
             .select('*')
-            .eq("user_id", user.id).order('created_at', { ascending: true });
+            .eq("user_id", user.id)
+            .order('created_at', { ascending: true });
+
         if (error) throw error;
+
+        await redis.set(cacheKey, JSON.stringify(data), { EX: 300 });
+
         return data;
     } catch (error) {
         console.error("Unexpected error:", error);
@@ -213,17 +242,32 @@ export async function selectOneCustomer(id: string) {
         throw new Error("Unauthorized: User not logged in.");
     }
 
+    const cacheKey = `customer:${user.id}:${id}`;
+
     try {
+        if (!redis.isOpen) await redis.connect();
+        const cachedData = await redis.get(cacheKey);
+
+        if (cachedData) {
+            console.log(`🟢 [CACHE HIT]: Single customer ${id}`);
+            return JSON.parse(cachedData);
+        }
+
+        console.log(`🔴 [CACHE MISS]: Fetching single customer ${id} from Supabase`);
         const { data, error } = await supabase
             .from('customers')
-            .select('*').eq('id', id).eq('user_id', user.id).single();
+            .select('*')
+            .eq('id', id)
+            .eq('user_id', user.id)
+            .single();
+
         if (error) throw error;
+
+        await redis.set(cacheKey, JSON.stringify(data), { EX: 300 });
+
         return data;
-        console.log(data);
     } catch (error) {
         console.error("Unexpected error:", error);
         return null;
     }
 }
-
-

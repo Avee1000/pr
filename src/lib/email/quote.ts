@@ -143,3 +143,110 @@ export async function sendQuoteEmail({
     `,
   });
 }
+
+interface OtpEmailParams {
+  toEmail: string;
+  toName: string;
+  otpCode: string;
+  expiresIn?: string;
+  logoUrl?: string;
+}
+
+export async function sendOtpEmail({
+  toEmail,
+  toName,
+  otpCode,
+  expiresIn = '2 minutes',
+  logoUrl = 'https://priceright-chi.vercel.app/_next/image?url=%2Fandroid-chrome-512x512.png&w=256&q=75',
+}: OtpEmailParams) {
+  return sendEmail({
+    toEmail,
+    toName,
+    subject: `Your Verification Code`,
+    htmlContent: `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Your Verification Code</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap');
+
+            /* Email Responsive Styles */
+            @media only screen and (max-width: 600px) {
+              .bg-body {
+                background-color: transparent !important; /* !important is required to override inline styles */
+              }
+              .responsive-table {
+                width: 100% !important;
+              }
+            }
+          </style>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #F8FAFC; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased;" class="bg-body">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #F8FAFC; padding: 40px 5px;" class="bg-body">
+            <tr>
+              <td align="center" valign="top">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 560px; background-color: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);" class="responsive-table">
+                  
+                  <tr>
+                    <td style="background-color: #FFC200; height: 6px; font-size: 0; line-height: 0;">&nbsp;</td>
+                  </tr>
+
+                  <tr>
+                    <td align="left" valign="top" style="padding: 32px 32px 16px 32px;">
+                      ${logoUrl
+                        ? `<img src="${logoUrl}" alt="PriceRight" width="50" style="display: block; width: 50px; max-width: 100%; height: auto; border: 0; outline: none; text-decoration: none;" />`
+                        : `<span style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 20px; color: #1A1A1A; letter-spacing: -0.5px;">Price<span style="color: #1A1A1A; background-color: #FFC200; padding: 2px 6px; border-radius: 4px;">Right</span></span>`
+                      }
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td align="left" valign="top" style="padding: 16px 32px 32px 32px;">
+                      <h1 style="margin: 0 0 16px 0; font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; color: #1A1A1A; letter-spacing: -0.3px; line-height: 1.3;">
+                        Authentication Code
+                      </h1>
+                      
+                      <p style="margin: 0 0 16px 0; font-size: 13px; line-height: 1.6; color: #1A1A1A;">
+                        Hi ${toName},
+                      </p>
+                      
+                      <p style="margin: 0 0 24px 0; font-size: 13px; line-height: 1.6; color: #475569;">
+                        Please use the security code below to complete your sign-in. This code is valid for <strong style="color: #1A1A1A;">${expiresIn}</strong>.
+                      </p>
+
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 28px;">
+                        <tr>
+                          <td style="padding: 24px; text-align: center;">
+                            <span style="font-family: 'Poppins', sans-serif; font-size: 32px; font-weight: 700; color: #1A1A1A; letter-spacing: 6px; font-variant-numeric: tabular-nums;">
+                              ${otpCode}
+                            </span>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <p style="margin: 0 0 6px 0; font-size: 13px; color: #64748B;">
+                        If you didn't request this code, you can safely ignore this email.
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td align="center" valign="top" style="background-color: #F8FAFC; border-top: 1px solid #E2E8F0; padding: 20px 32px; text-align: center;">
+                      <p style="margin: 0; font-size: 12px; color: #64748B; line-height: 1.5;">
+                        If you have any questions, feel free to reply directly to this email.
+                      </p>
+                    </td>
+                  </tr>
+
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+      </html>
+    `,
+  });
+}

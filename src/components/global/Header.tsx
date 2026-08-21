@@ -8,17 +8,29 @@ import SettingsNavLinksMobile from "@/components/accounts/SettingsNavigationMobi
 import NotificationIcon from "../notifications/NotificationIcon";
 import MobileHideWrapper, { OtherMobileNav } from "./MobileHideWrapper";
 import { HeaderDashboardButton } from "./HeaderDashboardButton";
+import { headers } from "next/headers";
 
 export default async function Header() {
+  const headersList = await headers();
+  const pathname = headersList.get('x-pathname') || '/';
+  
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const AUTH_ROUTES = ["/login", "/signup", "/forgot-password", "/reset-password"];
+  // Evaluate routing logic on the server via x-pathname
+  const AUTH_ROUTES = new Set(["/login", "/signup", "/forgot-password", "/reset-password"]);
+  const onAuthPage = AUTH_ROUTES.has(pathname) || pathname.startsWith("/quote");
+  
+  const isAccountPage = pathname.startsWith("/account");
+  const isDashboardPage = pathname.startsWith("/dashboard");
+  
+  const showDashboard = !isAccountPage;
+  const showAccount = !isDashboardPage;
 
   return (
-    <MobileHideWrapper routes={AUTH_ROUTES} breakpoint={768}>
+    <MobileHideWrapper routes={Array.from(AUTH_ROUTES)} breakpoint={768}>
       <header className="shrink-0 h-19 w-full z-20 border-b border-border bg-white dark:bg-ink dark:text-white">
         <div className="mx-auto flex items-center justify-between px-4 py-4">
           <OtherMobileNav
@@ -41,7 +53,13 @@ export default async function Header() {
               {user && <HeaderDashboardButton />}
               {!user ? <ThemeToggleIcon /> : <NotificationIcon />}
             </div>
-            <AuthHeaderActions isSignedIn={!!user} user={user} />
+            <AuthHeaderActions 
+              isSignedIn={!!user} 
+              user={user} 
+              onAuthPage={onAuthPage}
+              showDashboard={showDashboard}
+              showAccount={showAccount}
+            />
           </div>
         </div>
       </header>

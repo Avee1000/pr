@@ -2,8 +2,13 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-pathname', request.nextUrl.pathname)
+
     let supabaseResponse = NextResponse.next({
-        request,
+        request: {
+            headers: requestHeaders,
+        },
     })
 
     const supabase = createServerClient(
@@ -16,8 +21,12 @@ export async function middleware(request: NextRequest) {
                 },
                 setAll(cookiesToSet) {
                     cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+
+                    // 2. Preserve requestHeaders when Supabase refreshes cookies
                     supabaseResponse = NextResponse.next({
-                        request,
+                        request: {
+                            headers: requestHeaders,
+                        },
                     })
                     cookiesToSet.forEach(({ name, value, options }) =>
                         supabaseResponse.cookies.set(name, value, options)
@@ -30,9 +39,10 @@ export async function middleware(request: NextRequest) {
     const {
         data: { user }, error,
     } = await supabase.auth.getUser()
-    // console.log(user)
+
     console.log('Middleware User:', user?.email ?? 'No user found')
     console.log('Middleware Error:', error?.message ?? 'No error')
+
     const pathname = request.nextUrl.pathname
 
     const authRoutes = ['/login', '/signup', '/forgot-password', '/reset-password']
@@ -40,17 +50,59 @@ export async function middleware(request: NextRequest) {
 
     const protectedRoutes = ['/dashboard', '/account']
     const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
+    
+    const isVerifyRoute = pathname.startsWith('/auth/')
+    const sessionId = request.nextUrl.searchParams.get('session_id');
+
+    if (isVerifyRoute && !sessionId) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/login'
+        url.search = '' 
+        return NextResponse.redirect(url)
+    }
 
     if (user && isAuthRoute) {
         const url = request.nextUrl.clone()
         url.pathname = '/dashboard'
-        return NextResponse.redirect(url)
+        const response = NextResponse.redirect(url)
+        const flashData = JSON.stringify({
+            title: 'Already Logged In!',
+            message: 'You are already logged in.',
+            path: '/dashboard',
+        })
+        response.cookies.set('auth_flash_message', encodeURIComponent(flashData), {
+            maxAge: 20,
+            path: '/',
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+        })
+        return response
     }
 
     if (!user && isProtectedRoute) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'
-        return NextResponse.redirect(url)
+        const response = NextResponse.redirect(url)
+        const flashData = JSON.stringify({
+            title: 'Access Restricted!',
+            message: 'Please log in or sign up to access your dashboard.',
+            path: '/login',
+        })
+        response.cookies.set('auth_flash_message', encodeURIComponent(flashData), {
+            maxAge: 20,
+            path: '/',
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+        })
+        return response
+    }
+
+    if (pathname.startsWith('/auth/') || pathname.includes('?error')) {
+        supabaseResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+        supabaseResponse.headers.set('Pragma', 'no-cache')
+        supabaseResponse.headers.set('Expires', '0')
     }
 
     return supabaseResponse

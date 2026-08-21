@@ -1,5 +1,7 @@
 import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
+import { GlobalAlert } from '@/components/feedback/GlobalAlert';
+import { Suspense } from 'react';
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
     return (

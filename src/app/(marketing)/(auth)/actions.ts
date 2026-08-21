@@ -2,11 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { cookies } from 'next/headers';
-import { getClientCountry } from "@/lib/geo/geo";
-import { z } from "zod";
+import { success, z } from "zod";
 import { COUNTRIES } from "@/data/countries";
+import { redis } from "@/lib/redis/redis"
+import { sendOtpEmail } from '@/lib/email/quote';
+import { createClient } from "@/lib/supabase/server";
+import crypto from "node:crypto";
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { maskEmail } from "@/utils/action";
+import { cookies } from "next/headers";
+import { createServerClient } from '@supabase/ssr';
+import { headers } from 'next/headers';
 
 export interface AuthFormState {
   errors?: {
@@ -16,6 +22,8 @@ export interface AuthFormState {
     country?: string[];
     _form?: string[]; // Global/root errors
   };
+  success?: boolean;
+  sessionId?: string;
   message?: string;
 }
 
@@ -51,7 +59,7 @@ export async function signUp(
   if (!countryData) {
     return { errors: { country: ["Invalid country selected"] } };
   }
-  
+
   const locale = `${countryData.language}-${countryData.code}`;
   const currency = countryData.currency;
 
@@ -145,11 +153,18 @@ export async function signIn(
     };
   }
 
+  const supabase = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { persistSession: false } }
+  );
+
   const { email, password } = validatedFields.data;
 
+  let sessionIdToRedirect: string | null = null;
+
   try {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: authData, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -161,6 +176,55 @@ export async function signIn(
         },
       };
     }
+
+    try {
+      if (!redis.isOpen) await redis.connect();
+
+      function hasher(code: string) {
+        return crypto.createHash('sha256').update(code).digest('hex');
+      }
+
+      if (!authData.user) {
+        console.error("User not found");
+        return { errors: { _form: ["User session could not be established."] } };
+      }
+
+      const { session } = authData;
+      const user = authData.user;
+      const userEmail = user.email!;
+      const userName = user.user_metadata?.name || "User";
+
+      const rawOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      const hashedOtp = hasher(rawOtp);
+
+      sessionIdToRedirect = crypto.randomBytes(32).toString('hex');
+
+      const redisSessionKey = `session:${sessionIdToRedirect}`;
+      const redisAttemptsKey = `otp_attempts:${sessionIdToRedirect}`;
+
+      const sessionData = JSON.stringify({
+        userId: user.id,
+        userName: user.user_metadata?.name,
+        email: userEmail,
+        otp: hashedOtp,
+        accessToken: session.access_token,
+        refreshToken: session.refresh_token,
+      });
+
+      await redis.set(redisSessionKey, sessionData, { EX: 60 });
+      await redis.del(redisAttemptsKey);
+
+      await sendOtpEmail({
+        toEmail: userEmail,
+        toName: userName,
+        otpCode: rawOtp,
+      });
+
+    } catch (error) {
+      console.error(error);
+      return { errors: { _form: ["Redis or email service failed."] } };
+    }
+
   } catch (error) {
     return {
       errors: {
@@ -173,8 +237,11 @@ export async function signIn(
     };
   }
 
-  revalidatePath("/", "layout");
-  redirect("/dashboard");
+  if (sessionIdToRedirect) {
+    redirect(`/auth/verify?session_id=${sessionIdToRedirect}`);
+  }
+
+  return { errors: { _form: ["Failed to generate verification session."] } };
 }
 
 export async function signOut(): Promise<void> {
@@ -182,4 +249,197 @@ export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect("/login");
+}
+
+export async function getMaskedEmailFromSession(
+  sessionId: string
+): Promise<{ maskedEmail: string; email: string } | null> {
+  if (!sessionId) return null;
+
+  try {
+    if (!redis.isOpen) await redis.connect();
+
+    const sessionDataRaw = await redis.get(`session:${sessionId}`);
+    if (!sessionDataRaw) return null;
+
+    const sessionData = JSON.parse(sessionDataRaw);
+    if (!sessionData.email) return null;
+
+    // Returns the object matching the new Promise type
+    return {
+      maskedEmail: maskEmail(sessionData.email),
+      email: sessionData.email,
+    };
+  } catch (error) {
+    console.error("Error fetching email from Redis session:", error);
+    return null;
+  }
+}
+
+export async function verifyOTPCode(sessionId: string, rawInputOtp: string) {
+  if (!sessionId || !rawInputOtp) {
+    return { error: "Session ID and OTP code are required." };
+  }
+
+  try {
+    if (!redis.isOpen) await redis.connect();
+
+    const redisSessionKey = `session:${sessionId}`;
+    const redisAttemptsKey = `otp_attempts:${sessionId}`;
+
+    // 1. Check brute-force attempts limit (e.g., max 3 failed tries)
+    const currentAttempts = await redis.get(redisAttemptsKey);
+    if (currentAttempts && parseInt(currentAttempts, 10) >= 3) {
+      await redis.del(redisAttemptsKey);
+      return { error: "Too many failed attempts. Please request a new OTP.", locked: true };
+    } else {
+      // 2. Retrieve session data from Redis
+      const sessionDataRaw = await redis.get(redisSessionKey);
+      if (!sessionDataRaw) {
+        return { error: "OTP has expired or the session is invalid." };
+      }
+
+      // Parse your stored session object
+      const sessionData = JSON.parse(sessionDataRaw);
+      const storedHashedOtp = sessionData.otp;
+
+      // 3. Hash the user's input to compare securely
+      const inputHashedOtp = crypto.createHash('sha256').update(rawInputOtp).digest('hex');
+
+      // 4. Constant-time comparison to prevent timing attacks
+      const isValid = crypto.timingSafeEqual(
+        Buffer.from(storedHashedOtp, 'hex'),
+        Buffer.from(inputHashedOtp, 'hex')
+      );
+
+      if (!isValid) {
+        await redis.incr(redisAttemptsKey);
+        await redis.expire(redisAttemptsKey, 60);
+        return { error: "Invalid OTP code." };
+      }
+
+      await redis.del(redisSessionKey);
+      await redis.del(redisAttemptsKey);
+
+      const cookieStore = await cookies();
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            getAll() {
+              return cookieStore.getAll();
+            },
+            setAll(cookiesToSet) {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            },
+          },
+        }
+      );
+
+      // 6. Establish the Supabase Session (This sets the encrypted cookies automatically)
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: sessionData.accessToken,
+        refresh_token: sessionData.refreshToken,
+      });
+
+      if (sessionError) {
+        console.error("Failed to write Supabase cookies:", sessionError);
+        return { error: "Could not establish a secure session." };
+      }
+
+      await redis.del(redisSessionKey);
+      await redis.del(redisAttemptsKey);
+
+      return { success: true, message: "OTP verified successfully." };
+
+    }
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    return { error: "Internal server error during verification." };
+  }
+}
+
+export async function getOTPTTL(sessionId: string) {
+  if (!sessionId) {
+    return { error: "Session ID is required." };
+  }
+
+  if (!redis.isOpen) {
+    await redis.connect();
+  }
+
+  const redisSessionKey = `session:${sessionId}`;
+  const redisSessionTTL = await redis.ttl(redisSessionKey);
+
+  if (redisSessionTTL < 0) {
+    return { error: "Session has expired or does not exist." };
+  }
+
+  return { success: true, ttl: redisSessionTTL };
+}
+
+export async function resendOTPCode(sessionId: string) {
+  try {
+    if (!redis.isOpen) await redis.connect();
+
+    const redisSessionKey = `session:${sessionId}`;
+    const redisAttemptsKey = `otp_attempts:${sessionId}`;
+
+    const sessionDataRaw = await redis.get(redisSessionKey);
+
+    if (!sessionDataRaw) {
+      return { error: "Session has expired completely. Please sign in again." };
+    }
+
+    await redis.del(redisAttemptsKey);
+
+    const newPlainOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedOtp = crypto.createHash('sha256').update(newPlainOtp).digest('hex');
+
+    const sessionData = JSON.parse(sessionDataRaw);
+    sessionData.otp = hashedOtp;
+    const email = sessionData.email;
+
+    const timeToLive = 60;
+    await redis.set(redisSessionKey, JSON.stringify(sessionData), { EX: timeToLive });
+
+    await sendOtpEmail({
+      toEmail: email,
+      toName: sessionData.userName,
+      otpCode: newPlainOtp,
+    });
+
+    return { success: true, newSessionId: sessionId, timeToLive };
+  } catch (error) {
+    console.error("Error resending OTP:", error);
+    return { error: "Failed to resend code. Please try again." };
+  }
+}
+
+export async function signInWithGoogle() {
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+  const origin = `${protocol}://${host}`;
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'custom:google', 
+    options: {
+      redirectTo: `${origin}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    console.error('Error signing in with Google:', error.message);
+    return;
+  }
+
+  console.log(error)
+  if (data.url) {
+    redirect(data.url);
+  }
 }

@@ -1,16 +1,17 @@
-import { TbLoader } from "react-icons/tb"; 
+import { TbLoader } from "react-icons/tb";
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import Header from "@/components/global/Header";
-import Footer from "@/components/global/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import TopLoader from "@/components/global/TopLoader";
 import { RootProviders } from "@/components/providers/ProfileProvider";
 import ReactQueryProvider from "@/components/providers/ReactQueryProvider";
-import  { Toaster as ReactToaster } from 'react-hot-toast';
+import { Toaster as ReactToaster } from 'react-hot-toast';
+import RedirectAlert from "@/components/feedback/RedirectAlert";
+import { Suspense } from "react";
+import { GlobalAlert } from "@/components/feedback/GlobalAlert";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -104,13 +105,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ReactQueryProvider>
             <RootProviders>
               <TopLoader />
-              {/* Children will load either the marketing layout or dashboard layout */}
+              <RedirectAlert />
+              <Suspense fallback={null}>
+                <GlobalAlert />
+              </Suspense>
               {children}
-              <Toaster 
-              icons={{ loading: <TbLoader  className="animate-spin size-4.5"/> }} 
-              richColors 
-              position="top-center"
-              duration={3000}
+              <Toaster
+                icons={{ loading: <TbLoader className="animate-spin size-4.5" /> }}
+                richColors
+                position="top-center"
+                duration={3000}
               />
               <ReactToaster />
             </RootProviders>

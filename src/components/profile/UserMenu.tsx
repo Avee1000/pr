@@ -3,14 +3,26 @@
 import { useState, useRef, useEffect } from 'react'
 import { SignOutButton } from '../auth/SignOutButton'
 import Name from '../global/Names'
-import { User2 } from 'lucide-react'
+import { User2, Monitor } from 'lucide-react' // Added LayoutDashboard icon
 import ThemeToggleDropDown from "../global/ThemeDropDown"
 import CurrencySelector from './CurrencySelector'
 import Link from 'next/link'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { LoadingState } from '../feedback/loading-state'
 
-export default function UserMenu({ user, children }: { user: any; children?: React.ReactNode }) {
+interface UserMenuProps {
+  user: any
+  children?: React.ReactNode
+  showDashboard?: boolean
+  showAccount?: boolean
+}
+
+export default function UserMenu({ 
+  user, 
+  children, 
+  showDashboard = true, 
+  showAccount = true 
+}: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [imageError, setImageError] = useState(false) 
   const menuRef = useRef<HTMLDivElement>(null)
@@ -20,10 +32,7 @@ export default function UserMenu({ user, children }: { user: any; children?: Rea
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as HTMLElement
       if (!document.body.contains(target)) return
-
-      if (target.closest('.prevent-menu-close')) {
-        return
-      }
+      if (target.closest('.prevent-menu-close')) return
       if (menuRef.current && !menuRef.current.contains(target)) {
         setIsOpen(false)
       }
@@ -44,9 +53,7 @@ export default function UserMenu({ user, children }: { user: any; children?: Rea
 
   if (!user) return null
 
-  // Grab the avatar URL from either the auth metadata or your fetched profile state
   const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url
-
   const initials = user?.user_metadata?.name
     ?.split(' ')
     .map((n: string) => n[0])
@@ -72,17 +79,14 @@ export default function UserMenu({ user, children }: { user: any; children?: Rea
                 alt={user?.user_metadata?.name || "User avatar"}
                 className="h-full w-full object-cover"
                 sizes='100px'
-                onError={() => setImageError(true)} // Triggers fallback to initials if image fails/errors out
+                onError={() => setImageError(true)}
               />
             ) : (
               <span>{initials}</span>
             )
           )}
         </div>
-        <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-w-xs opacity-100 sm:pl-2 sm:pr-3" : "max-w-0 opacity-0 px-0"
-            }`}
-        >
+        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-w-xs opacity-100 sm:pl-2 sm:pr-3" : "max-w-0 opacity-0 px-0"}`}>
           <span className="text-sm hidden font-medium sm:block truncate sm:max-w-20 whitespace-nowrap">
             <Name username={user?.user_metadata?.name || "Guest"} fullname={false} />
           </span>
@@ -103,11 +107,22 @@ export default function UserMenu({ user, children }: { user: any; children?: Rea
             </p>
           </div>
 
-          <div className="border-b px-2 py-1 flex items-center text-ink-dark dark:text-muted-foreground">
-            <Link href="/account/profile" className="py-2 px-3 hover:bg-muted hover:text-ink dark:hover:text-muted-foreground dark:hover:bg-muted flex items-center gap-2 w-full rounded-md text-xs transition-colors text-left">
-              <User2 className="w-4 h-4" />
-              <span>Account</span>
-            </Link>
+          <div className="border-b px-2 py-1 flex flex-col gap-1 text-ink-dark dark:text-muted-foreground">
+            {/* Conditionally rendered Account Link */}
+            {showDashboard && (
+              <Link href="/account/profile" className="py-2 px-3 hover:bg-muted hover:text-ink dark:hover:text-muted-foreground dark:hover:bg-muted flex items-center gap-2 w-full rounded-md text-xs transition-colors text-left">
+                <User2 className="w-4 h-4" />
+                <span>Account</span>
+              </Link>
+            )}
+
+            {/* Conditionally rendered Dashboard Link */}
+            {showAccount && (
+              <Link href="/dashboard" className="py-2 px-3 hover:bg-muted hover:text-ink dark:hover:text-muted-foreground dark:hover:bg-muted flex items-center gap-2 w-full rounded-md text-xs transition-colors text-left">
+                <Monitor className="w-4 h-4" />
+                <span>Workspace</span>
+              </Link>
+            )}
           </div>
 
           <div className="py-1 border-b border-zinc-100 dark:border-zinc-800">
