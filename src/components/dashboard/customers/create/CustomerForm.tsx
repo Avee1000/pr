@@ -13,8 +13,9 @@ import {
     CardDescription,
     CardContent,
 } from "@/components/ui/card";
-import { SubmitButton } from "../../../global/SubmitButton"; 
+import { SubmitButton } from "../../../global/SubmitButton";
 import { BiSolidCheckCircle } from "react-icons/bi";
+import { updateOnboardingProgress } from "@/lib/onboarding/action";
 
 const CustomerFormSchema = z.object({
     name: z
@@ -73,8 +74,16 @@ export default function CustomerForm({ action, onSuccess }: CustomerFormProps) {
             toast(state.message || "Customer created successfully!", {
                 icon: <BiSolidCheckCircle className="size-5" />
             });
-            onSuccess?.()
-            // router.refresh();
+            onSuccess?.();
+
+            (async () => {
+                try {
+                    await updateOnboardingProgress("customer_details");
+                } catch (error) {
+                    console.error("Failed to update onboarding progress:", error);
+                }
+            })();
+
         } else if (state?.message && !state?.success) {
             setShowErrors(true);
             toast.error(state.message);

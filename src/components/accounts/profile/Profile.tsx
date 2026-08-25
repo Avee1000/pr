@@ -19,9 +19,7 @@ export default function ProfileInformation() {
     const middleName = fullName.split(" ")[1] ?? "Not specified";
     const lastName = fullName.split(" ")[2] ?? "Not specified";
 
-    // Keep the skeleton for the initial async hydration only. Once we have a user
-    // or profile, the page should render real values instead of staying locked on
-    // a null state.
+
     if (isLoadingProfile && !profile) {
         return <ProfileSkeleton />;
     }

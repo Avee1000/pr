@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { SignOutButton } from '../auth/SignOutButton'
+import { SignOutButton } from '../auth/signup/SignOutButton'
 import Name from '../global/Names'
 import { User2, Monitor } from 'lucide-react' // Added LayoutDashboard icon
 import ThemeToggleDropDown from "../global/ThemeDropDown"

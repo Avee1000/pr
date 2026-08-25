@@ -1,22 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
-import { AuthHeaderActions } from "./AuthHeaderActions";
-import ThemeToggleIcon from "./ThemeIconButton";
+import ThemeToggleIcon from "@/components/global/ThemeIconButton";
 import IsMobileOrderNavLinks from "../dashboard/IsMobileDashboardNavigation";
 import SettingsNavLinksMobile from "@/components/accounts/SettingsNavigationMobile";
 import NotificationIcon from "../notifications/NotificationIcon";
-import MobileHideWrapper, { OtherMobileNav } from "./MobileHideWrapper";
-import { HeaderDashboardButton } from "./HeaderDashboardButton";
 import { headers } from "next/headers";
 import { cn } from '@/lib/utils';
 
 interface headerProps {
-  showNavigation?: boolean;
   className?: string;
 }
 
-export default async function Header({ className, showNavigation = true }: headerProps) {
+export default async function Header({ className }: headerProps) {
   const headersList = await headers();
   const pathname = headersList.get('x-pathname') || '/';
   
@@ -36,13 +32,9 @@ export default async function Header({ className, showNavigation = true }: heade
   const showAccount = !isDashboardPage;
 
   return (
-    <MobileHideWrapper routes={Array.from(AUTH_ROUTES)} breakpoint={768}>
       <header className={cn("shrink-0 h-19 w-full z-20 border-b border-border bg-white dark:bg-ink dark:text-white", className)}>
         <div className="mx-auto flex items-center justify-between px-4 py-4">
-          {showNavigation && (<OtherMobileNav
-            ElementToBeShown={<IsMobileOrderNavLinks />}
-            ElementToBeHidden={<SettingsNavLinksMobile />}
-          />)}
+
           <Link href="/" className="flex items-center gap-1 text-lg font-semibold text-ink dark:text-white">
             <Image
               src="/android-chrome-512x512.png"
@@ -56,19 +48,10 @@ export default async function Header({ className, showNavigation = true }: heade
           </Link>
           <div className="flex flex-row justify-center items-center gap-2">
             <div className="flex flex-row justify-center items-center gap-1">
-              {user && <HeaderDashboardButton />}
               {!user ? <ThemeToggleIcon /> : <NotificationIcon />}
             </div>
-            <AuthHeaderActions 
-              isSignedIn={!!user} 
-              user={user} 
-              onAuthPage={onAuthPage}
-              showDashboard={showDashboard}
-              showAccount={showAccount}
-            />
           </div>
         </div>
       </header>
-    </MobileHideWrapper>
   );
 }

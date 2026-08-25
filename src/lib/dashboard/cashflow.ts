@@ -36,6 +36,7 @@ export async function getCashFlowSummary(): Promise<CashFlowSummary> {
 
   if (error || !orders) {
     console.error("Supabase select orders error (cash flow):", error);
+    console.error(error)
     return EMPTY_SUMMARY;
   }
 

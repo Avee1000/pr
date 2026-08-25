@@ -81,10 +81,10 @@ export function SelectPopover({
         },
         [onChange]
     );
-
+    console.log(value)
     return (
         <>
-            {name && <input type="hidden" name={name} value={value || ""} required />}
+            {name && <input type="hidden" name={name} value={value} required />}
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger render={
                     <Button

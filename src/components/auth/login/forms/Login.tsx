@@ -16,7 +16,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { toast } from 'sonner';
-import SocialAuthButtons from "./otherAuth/SocialAuth";
+import SocialAuthButtons from "../../otherAuth/SocialAuth";
 
 const initialState: AuthFormState = {};
 
@@ -59,13 +59,13 @@ export function LoginForm() {
   }, [isPending]);
 
   return (
-    <div className="space-y-7 ">
-      <Card className="max-sm:border-0 max-sm:shadow-none max-sm:ring-0 max-sm:w-full  max-sm:outline-none max-sm:bg-transparent">
-        <CardHeader>
-          <CardTitle className="font-heading text-2xl font-bold">Welcome back</CardTitle>
+    <div className="space-y-2 max-w-md mx-auto">
+      <Card className="ring-0 border-none shadow-none px-1 w-full max-w-lg mx-auto bg-transparent m-0">
+        <CardHeader className="px-0 mb-4">
+          <CardTitle className="font-heading text-2xl px-0 font-bold">Welcome back</CardTitle>
           <CardDescription>Sign in to your PriceRight workspace.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-0">
           <form action={formAction} className="flex flex-col gap-6  max-sm:space-y-2" noValidate>
             {rootError && (
               <div
@@ -138,12 +138,7 @@ export function LoginForm() {
             <SubmitButton label="Sign in" Icon={LogIn} />
           </form>
 
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="font-semibold text-foreground underline">
-              Create one
-            </Link>
-          </p>
+
         </CardContent>
       </Card>
 

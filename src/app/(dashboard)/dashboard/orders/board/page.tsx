@@ -1,13 +1,13 @@
 import Link from "next/link";
 import OrderBoard, { BoardCard } from "@/components/dashboard/orders/board/OrderBoard";
 import { selectAllOrders } from "@/lib/orders/action";
-import { OrderStatus, PaymentStatus } from "@/lib/types/dashBoardTypes";
+import { OrderStatus, PaymentStatus, Order } from "@/lib/types/dashBoardTypes";
 import Information from "@/components/global/Information";
 
 export default async function OrderBoardPage() {
   const orders = await selectAllOrders();
 
-  const cards: BoardCard[] = (orders ?? []).map((order) => ({
+  const cards: BoardCard[] = (orders ?? []).map((order: any) => ({
     id: String(order.allOrders.id),
     description: order.allOrders.description ?? "Untitled order",
     price: Number(order.allOrders.price ?? 0),

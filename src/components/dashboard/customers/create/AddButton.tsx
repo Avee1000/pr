@@ -58,7 +58,6 @@ export default function AddButton() {
 
         resetIdleTimer();
 
-        // Clean up everything properly
         return () => {
             window.removeEventListener("scroll", handleScroll, { capture: true });
             window.removeEventListener("click", handleActivity);
@@ -67,6 +66,19 @@ export default function AddButton() {
             clearTimeout(idleTimeout);
         };
     }, []);
+
+    if (isDesktop) {
+        return (
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <div className="self-center">
+                    <Button onClick={() => setIsOpen(true)} className={'px-3'}><Plus />Create Customer</Button>
+                </div>
+                <DialogContent className="sm:max-w-150.25">
+                    <CustomerForm action={createCustomer} onSuccess={() => setIsOpen(false)} />
+                </DialogContent>
+            </Dialog>
+        )
+    }
 
     return (
         <Drawer open={isOpen} onOpenChange={setIsOpen} showSwipeHandle>

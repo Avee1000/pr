@@ -20,7 +20,7 @@ export interface AuthFormState {
     email?: string[];
     password?: string[];
     country?: string[];
-    _form?: string[]; // Global/root errors
+    _form?: string[];
   };
   success?: boolean;
   sessionId?: string;
@@ -33,6 +33,33 @@ const signUpSchema = z.object({
   country: z.string().min(2, "Country is required."),
   password: z.string().min(6, "Password must be at least 6 characters."),
 });
+
+export interface OrganizationAuthFormState {
+  errors?: {
+    name?: string[];
+    company_name?: string[];
+    company_size?: string[];
+    work_email?: string[];
+    country?: string[];
+    password?: string[];
+    _form?: string[];
+  };
+  success?: boolean;
+  sessionId?: string;
+  message?: string;
+}
+
+const organizationSignUpSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters."),
+  company_name: z.string().min(2, "Company name must be at least 2 characters."),
+  company_size: z.enum(['1-10', '11-50', '51-200', '+200'], "Choose a valid option"),
+  work_email: z.string().regex(
+    /^(?!\.)(?!.*\.\.)[a-z0-9_+'\.-]+[a-z0-9_+-]@(?!(?:gmail|yahoo|hotmail|outlook|icloud|aol|proton|protonmail|live|gmx|yandex|mail)\.)(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i,
+    "Please enter a valid work email address (free email providers like Gmail or Yahoo are not allowed)."
+  ),
+  country: z.string().min(2, "Country is required."),
+  password: z.string().min(6, "Password must be at least 6 characters."),
+})
 
 export async function signUp(
   _prevState: AuthFormState,
@@ -83,12 +110,11 @@ export async function signUp(
     if (error) {
       return {
         errors: {
-          _form: [error.message], // Fixed: wrapped string in array
+          _form: [error.message],
         },
       };
     }
 
-    // If session is null, email confirmation is enabled in Supabase
     if (!data.session) {
       isEmailConfirmationRequired = true;
     }
@@ -130,6 +156,93 @@ export async function signUp(
   }
 
   revalidatePath("/", "layout");
+  // redirect("/dashboard");
+  return { success: true, message: "Account created successfully"}
+}
+
+export async function organizationSignUp(
+  _prevState: OrganizationAuthFormState,
+  formData: FormData
+): Promise<OrganizationAuthFormState> {
+  const validatedFields = organizationSignUpSchema.safeParse({
+    name: String(formData.get("name")).trim(),
+    company_name: String(formData.get("company_name")).trim(),
+    company_size: String(formData.get("company_size")).trim(),
+    work_email: String(formData.get("work_email")).trim(),
+    country: String(formData.get("country") ?? "").trim(),
+    password: String(formData.get("password") ?? ""),
+  })
+
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error?.flatten().fieldErrors
+    }
+  }
+
+  const { name, company_name, company_size, work_email, password, country } = validatedFields.data;
+
+  const countryData = COUNTRIES.find((c) => c.code === country);
+
+  if (!countryData) {
+    return { errors: { country: ["Invalid country selected"] } };
+  }
+
+  const locale = `${countryData.language}-${countryData.code}`;
+  const currency = countryData.currency;
+
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase.auth.signUp({
+      email: work_email,
+      password: password,
+      options: {
+        data: {
+          name,
+          country,
+          locale,
+          currency,
+        },
+      },
+    })
+
+    if (error) {
+      console.error("Error signing up " + error)
+      return {
+        errors: {
+          _form: [error.message],
+        }
+      }
+    }
+
+    const { error: InsertError } = await supabase
+      .from('profiles')
+      .update({
+        full_name: name,
+        account_type: 'organization',
+        company_name: company_name,
+        company_size: company_size,
+        work_email: work_email,
+      })
+      .eq("id", data.user?.id);
+
+    if (InsertError) {
+      console.error("Error inserting into profiles (organization)", InsertError)
+      return { success: false, message: InsertError.message }
+    }
+  } catch (error) {
+    return {
+      errors: {
+        _form: [
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred. Please try again.",
+        ],
+      },
+    };
+  }
+  revalidatePath("/", "layout");
   redirect("/dashboard");
 }
 
@@ -170,6 +283,7 @@ export async function signIn(
     });
 
     if (error) {
+      console.error(error)
       return {
         errors: {
           _form: ["Invalid email or password. Please try again."],
@@ -427,7 +541,7 @@ export async function signInWithGoogle() {
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'custom:google', 
+    provider: 'custom:google',
     options: {
       redirectTo: `${origin}/auth/callback`,
     },

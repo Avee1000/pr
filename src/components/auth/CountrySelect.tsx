@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SelectPopover } from "@/components/global/commandSearch";
 import { InputWithSelect } from "./CountryCodeSelect";
 import { COUNTRIES } from "@/data/countries";
@@ -20,35 +20,44 @@ const COUNTRY_CODES = COUNTRIES.map((c) => ({
   label: c.country,
 }));
 
-export function CountryAndPhoneForm({ error }: { error?: string }) {
-  const [selectedCountryCode, setSelectedCountryCode] = useState<string>("");
+interface CountryAndPhoneFormProps {
+  value?: string;
+  error?: string;
+  onCountryChange?: (countryCode: string) => void;
+}
+
+export function CountryAndPhoneForm({ error, value = "", onCountryChange }: CountryAndPhoneFormProps) {
+  const [selectedCountryCode, setSelectedCountryCode] = useState<string>(value);
   const [phoneCode, setPhoneCode] = useState("+1");
   const [phone, setPhone] = useState("");
 
-  // 1. DERIVED STATE: Always calculated dynamically from selectedCountryCode
   const selectedCountry = COUNTRIES.find((c) => c.code === selectedCountryCode);
   const locale = selectedCountry ? `${selectedCountry.language}-${selectedCountry.code}` : "";
   const currency = selectedCountry?.currency ?? "";
 
-  // 2. Country -> Phone synchronization
+  useEffect(() => {
+    setSelectedCountryCode(value);
+  }, [value]);
+
   const handleCountryChange = (countryCodeValue: string) => {
     setSelectedCountryCode(countryCodeValue);
-
+    onCountryChange?.(countryCodeValue);
     const foundCountry = COUNTRIES.find((c) => c.code === countryCodeValue);
     if (foundCountry?.phone_code) {
       setPhoneCode(foundCountry.phone_code);
     }
   };
 
-  // 3. Phone -> Country synchronization (locale & currency update automatically!)
   const handlePhoneCodeChange = (newPhoneCode: string) => {
     setPhoneCode(newPhoneCode);
-
     const foundCountry = COUNTRIES.find((c) => c.phone_code === newPhoneCode);
     if (foundCountry?.code) {
       setSelectedCountryCode(foundCountry.code);
+      onCountryChange?.(foundCountry.code);
     }
   };
+
+  console.log(selectedCountryCode)
 
   return (
     <div className="flex flex-row w-full justify-between gap-2 max-sm:flex-col max-sm:gap-6">
