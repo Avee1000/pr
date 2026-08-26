@@ -39,7 +39,7 @@ export function LoginPageSelector() {
     };
 
     return (
-        <div className="relative overflow-hidden w-full py-4 min-h-128">
+        <div className="relative overflow-hidden w-full py-4">
             <AnimatePresence mode="wait">
                     <div>
                         <LoginForm />

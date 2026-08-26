@@ -157,7 +157,7 @@ export async function signUp(
 
   revalidatePath("/", "layout");
   // redirect("/dashboard");
-  return { success: true, message: "Account created successfully"}
+  return { success: true, message: "Account created successfully" }
 }
 
 export async function organizationSignUp(
@@ -323,9 +323,10 @@ export async function signIn(
         otp: hashedOtp,
         accessToken: session.access_token,
         refreshToken: session.refresh_token,
+        otpExpiresAt: Date.now() + 30 * 1000,
       });
 
-      await redis.set(redisSessionKey, sessionData, { EX: 60 });
+      await redis.set(redisSessionKey, sessionData, { EX: 300 });
       await redis.del(redisAttemptsKey);
 
       await sendOtpEmail({
@@ -401,134 +402,133 @@ export async function verifyOTPCode(sessionId: string, rawInputOtp: string) {
     const redisSessionKey = `session:${sessionId}`;
     const redisAttemptsKey = `otp_attempts:${sessionId}`;
 
-    // 1. Check brute-force attempts limit (e.g., max 3 failed tries)
-    const currentAttempts = await redis.get(redisAttemptsKey);
-    if (currentAttempts && parseInt(currentAttempts, 10) >= 3) {
-      await redis.del(redisAttemptsKey);
-      return { error: "Too many failed attempts. Please request a new OTP.", locked: true };
-    } else {
-      // 2. Retrieve session data from Redis
-      const sessionDataRaw = await redis.get(redisSessionKey);
-      if (!sessionDataRaw) {
-        return { error: "OTP has expired or the session is invalid." };
-      }
-
-      // Parse your stored session object
-      const sessionData = JSON.parse(sessionDataRaw);
-      const storedHashedOtp = sessionData.otp;
-
-      // 3. Hash the user's input to compare securely
-      const inputHashedOtp = crypto.createHash('sha256').update(rawInputOtp).digest('hex');
-
-      // 4. Constant-time comparison to prevent timing attacks
-      const isValid = crypto.timingSafeEqual(
-        Buffer.from(storedHashedOtp, 'hex'),
-        Buffer.from(inputHashedOtp, 'hex')
-      );
-
-      if (!isValid) {
-        await redis.incr(redisAttemptsKey);
-        await redis.expire(redisAttemptsKey, 60);
-        return { error: "Invalid OTP code." };
-      }
-
-      await redis.del(redisSessionKey);
-      await redis.del(redisAttemptsKey);
-
-      const cookieStore = await cookies();
-      const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-          cookies: {
-            getAll() {
-              return cookieStore.getAll();
-            },
-            setAll(cookiesToSet) {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            },
-          },
-        }
-      );
-
-      // 6. Establish the Supabase Session (This sets the encrypted cookies automatically)
-      const { error: sessionError } = await supabase.auth.setSession({
-        access_token: sessionData.accessToken,
-        refresh_token: sessionData.refreshToken,
-      });
-
-      if (sessionError) {
-        console.error("Failed to write Supabase cookies:", sessionError);
-        return { error: "Could not establish a secure session." };
-      }
-
-      await redis.del(redisSessionKey);
-      await redis.del(redisAttemptsKey);
-
-      return { success: true, message: "OTP verified successfully." };
-
+    const sessionDataRaw = await redis.get(redisSessionKey);
+    if (!sessionDataRaw) {
+      return { error: "Verification session expired. Please sign in again." };
     }
+
+    const sessionData = JSON.parse(sessionDataRaw);
+
+    // Check 30-second OTP window
+    if (Date.now() > sessionData.otpExpiresAt) {
+      return { error: "OTP code has expired. Please click Resend Code.", codeExpired: true };
+    }
+
+    const currentAttempts = await redis.get(redisAttemptsKey);
+    const attemptsCount = currentAttempts ? parseInt(currentAttempts, 10) : 0;
+
+    if (attemptsCount >= 3) {
+      await redis.del([redisSessionKey, redisAttemptsKey]);
+      return { error: "Too many failed attempts. Session invalidated.", locked: true };
+    }
+
+    const inputHashedOtp = crypto.createHash('sha256').update(rawInputOtp).digest('hex');
+
+    const isValid = crypto.timingSafeEqual(
+      Buffer.from(sessionData.otp, 'hex'),
+      Buffer.from(inputHashedOtp, 'hex')
+    );
+
+    if (!isValid) {
+      const newAttempts = await redis.incr(redisAttemptsKey);
+      if (newAttempts === 1) await redis.expire(redisAttemptsKey, 30);
+
+      if (newAttempts >= 3) {
+        await redis.del([redisSessionKey, redisAttemptsKey]);
+        return { error: "Too many failed attempts. Session invalidated.", locked: true };
+      }
+
+      return { error: `Invalid OTP code. ${3 - newAttempts} attempt(s) remaining.` };
+    }
+
+    await redis.del([redisSessionKey, redisAttemptsKey]);
+
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
+    const { error: sessionError } = await supabase.auth.setSession({
+      access_token: sessionData.accessToken,
+      refresh_token: sessionData.refreshToken,
+    });
+
+    if (sessionError) {
+      console.error("Failed to write Supabase cookies:", sessionError);
+      return { error: "Could not establish a secure session." };
+    }
+    return { success: true, message: "OTP verified successfully." };
   } catch (error) {
-    console.error("Error verifying OTP:", error);
     return { error: "Internal server error during verification." };
   }
 }
 
 export async function getOTPTTL(sessionId: string) {
-  if (!sessionId) {
-    return { error: "Session ID is required." };
+  if (!sessionId) return { error: "Session ID is required." };
+
+  try {
+    if (!redis.isOpen) await redis.connect();
+
+    const sessionDataRaw = await redis.get(`session:${sessionId}`);
+    if (!sessionDataRaw) return { error: "Session expired." };
+
+    const sessionData = JSON.parse(sessionDataRaw);
+    const remainingMs = sessionData.otpExpiresAt - Date.now();
+    const ttlSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+
+    return { success: true, ttl: ttlSeconds };
+  } catch (error) {
+    return { error: "Failed to read TTL." };
   }
-
-  if (!redis.isOpen) {
-    await redis.connect();
-  }
-
-  const redisSessionKey = `session:${sessionId}`;
-  const redisSessionTTL = await redis.ttl(redisSessionKey);
-
-  if (redisSessionTTL < 0) {
-    return { error: "Session has expired or does not exist." };
-  }
-
-  return { success: true, ttl: redisSessionTTL };
 }
 
 export async function resendOTPCode(sessionId: string) {
   try {
     if (!redis.isOpen) await redis.connect();
 
-    const redisSessionKey = `session:${sessionId}`;
-    const redisAttemptsKey = `otp_attempts:${sessionId}`;
+    const oldSessionKey = `session:${sessionId}`;
+    const oldAttemptsKey = `otp_attempts:${sessionId}`;
 
-    const sessionDataRaw = await redis.get(redisSessionKey);
-
+    const sessionDataRaw = await redis.get(oldSessionKey);
     if (!sessionDataRaw) {
-      return { error: "Session has expired completely. Please sign in again." };
+      return { error: "Session expired completely. Please sign in again." };
     }
 
-    await redis.del(redisAttemptsKey);
+    const sessionData = JSON.parse(sessionDataRaw);
+
+    // Delete old session and attempts
+    await redis.del([oldAttemptsKey]);
 
     const newPlainOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedOtp = crypto.createHash('sha256').update(newPlainOtp).digest('hex');
+    const newSessionId = crypto.randomBytes(32).toString('hex');
 
-    const sessionData = JSON.parse(sessionDataRaw);
     sessionData.otp = hashedOtp;
-    const email = sessionData.email;
+    sessionData.otpExpiresAt = Date.now() + 30 * 1000; // Reset 30s OTP window
 
-    const timeToLive = 60;
-    await redis.set(redisSessionKey, JSON.stringify(sessionData), { EX: timeToLive });
+    const newSessionKey = `session:${newSessionId}`;
+    // Preserve 5-minute Redis session lifetime
+    await redis.set(newSessionKey, JSON.stringify(sessionData), { EX: 300 });
 
     await sendOtpEmail({
-      toEmail: email,
+      toEmail: sessionData.email,
       toName: sessionData.userName,
       otpCode: newPlainOtp,
     });
 
-    return { success: true, newSessionId: sessionId, timeToLive };
+    return { success: true, newSessionId, timeToLive: 30 };
   } catch (error) {
-    console.error("Error resending OTP:", error);
     return { error: "Failed to resend code. Please try again." };
   }
 }

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { LoginPageSelector } from "./LoginSelector";
 import { cn } from '@/lib/utils'
 
-function LogoLink({ className }: { className: string}) {
+function LogoLink({ className }: { className: string }) {
     return (
         <div className={cn("flex flex-row items-center justify-between", className)}>
             <Link href="/" className="flex items-center gap-2">
@@ -23,9 +23,8 @@ function LogoLink({ className }: { className: string}) {
 export function LoginPageComp() {
     return (
         <div className="grid min-h-screen grid-cols-1 bg-background text-foreground xl:grid-cols-12 w-full">
-            {/* Column 2: Who We Are / Hero Feature Panel */}
             <div className="relative hidden flex-col dark:bg-ink-darker bg-white justify-center items-center overflow-hidden border-r border-muted-foreground/25 p-12 xl:col-span-7 px-8 py-6 w-full xl:flex xl:p-16">
-                <LogoLink className={'max-xl:hidden absolute top-6 left-8'}/>
+                <LogoLink className={'max-xl:hidden absolute top-6 left-8'} />
                 <div
                     className="absolute inset-0 opacity-10"
                     style={{
@@ -125,7 +124,7 @@ export function LoginPageComp() {
             </div>
 
             <div className="relative flex flex-col justify-between xl:col-span-5 px-8 py-6 min-h-screen">
-                <LogoLink className={'xl:hidden'}/>
+                <LogoLink className={'xl:hidden'} />
                 {/* Main Form Center Box - Exact Vertical & Horizontal Middle */}
                 <div className="flex-1 flex flex-col justify-center items-center w-full">
                     <div className="w-full max-w-lg">

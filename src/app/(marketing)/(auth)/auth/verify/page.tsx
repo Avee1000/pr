@@ -15,6 +15,11 @@ export default async function VerifyPage({
     searchParams: Promise<{ session_id?: string }>;
 }) {
     const { session_id: sessionId } = await searchParams;
+
+    if (!sessionId) {
+        redirect('/login?error=session_expired');
+    }
+
     const maskedEmail = sessionId ? await getMaskedEmailFromSession(sessionId) : null;
     const timeToLive = await getOTPTTL(sessionId as string);
 
@@ -27,8 +32,11 @@ export default async function VerifyPage({
             <div className="absolute top-6 right-6  z-10">
                 <ThemeToggleIcon />
             </div>
-            <LogoLink className={'max-xl:hidden absolute top-6 left-8'} />
-            <OtpVerificationForm session_Id={sessionId} maskedEmail={maskedEmail.maskedEmail} timeToLive={timeToLive.ttl as number} />;
+            <LogoLink className={'absolute top-6 left-8'} />
+            <OtpVerificationForm
+                session_Id={sessionId}
+                maskedEmail={maskedEmail.maskedEmail}
+                timeToLive={timeToLive.ttl as number ?? 0} />;
         </>
     )
 }

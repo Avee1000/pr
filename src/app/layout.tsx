@@ -115,6 +115,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 richColors
                 position="top-center"
                 duration={3000}
+                visibleToasts={1}
+                closeButton={true}
               />
               <ReactToaster />
             </RootProviders>

@@ -2,19 +2,12 @@
 
 import React, { useState, useRef, ClipboardEvent, useEffect } from 'react';
 import { ShieldCheck, CheckCircle } from 'lucide-react';
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-    CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from '@/components/global/SubmitButton';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { verifyOTPCode, resendOTPCode } from '@/app/(marketing)/(auth)/actions';
-import { es } from 'date-fns/locale';
 
 interface OtpFormProps {
     session_Id: string;
@@ -27,8 +20,9 @@ export function OtpVerificationForm({ session_Id, maskedEmail, timeToLive }: Otp
     const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
     const [isPending, setIsPending] = useState(false);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-    const [count, setCount] = useState(Math.round(timeToLive / 2));
-    const [isResendActive, setIsResendActive] = useState(false);
+
+    const [count, setCount] = useState(timeToLive);
+    const [isResendActive, setIsResendActive] = useState<boolean>(timeToLive <= 0);
     const [isLocked, setIsLocked] = useState(false);
     const [currentSessionId, setCurrentSessionId] = useState(session_Id);
 
@@ -87,9 +81,7 @@ export function OtpVerificationForm({ session_Id, maskedEmail, timeToLive }: Otp
         const finalOtp = otp.join('');
 
         if (finalOtp.length < 6) {
-            toast.error("Please enter the complete 6-digit code.", {
-                classNames: { error: "!bg-background !text-foreground !border-border" }
-            });
+            toast.error("Please enter the complete 6-digit code.");
             return;
         }
 
@@ -98,21 +90,22 @@ export function OtpVerificationForm({ session_Id, maskedEmail, timeToLive }: Otp
             const res = await verifyOTPCode(currentSessionId, finalOtp);
 
             if (res?.error) {
-                toast.error(res.error, {
-                    classNames: { error: "!bg-background !text-foreground !border-border" }
-                });
+                toast.error(res.error);
+                if (res?.locked) {
+                    setIsLocked(true);
+                    setIsResendActive(false);
+                    toast.error("Too many failed attempts. Redirecting to login...", {
+                        duration: 1000,
+                    });
+                    setTimeout(() => {
+                        router.push("/login?error=too_many_attempts");
+                    }, 2000);
+                }
             } else if (res?.success) {
                 toast.success("Verification successful!", {
-                    classNames: { success: "!bg-background !text-foreground !border-border" }
+                    className: "!bg-background !text-foreground !border-border"
                 });
                 router.push("/dashboard");
-            }
-            if (res?.locked) {
-                setIsLocked(true);
-                setIsResendActive(true);
-                toast.error("Too many failed attempts. Please request a new code.", {
-                    classNames: { error: "!bg-background !text-foreground !border-border" }
-                });
             }
         } catch (error) {
             toast.error("An unexpected error occurred.");
@@ -133,12 +126,15 @@ export function OtpVerificationForm({ session_Id, maskedEmail, timeToLive }: Otp
 
             if (res.success && res.newSessionId) {
                 setCurrentSessionId(res.newSessionId);
-                // setCount(res.newSessionId ? timeToLive);
+                window.history.replaceState(null, '', `/auth/verify?session_id=${res.newSessionId}`);
+
+                // Corrected Timer Reset
+                setCount(res.timeToLive);
                 setIsResendActive(false);
                 setIsLocked(false);
-                setOtp(['', '', '', '', '', '']); // Clear inputs
+                setOtp(['', '', '', '', '', '']);
                 toast.success("A new code has been sent to your email.", {
-                    classNames: { success: "!bg-background !text-foreground !border-border" }
+                    className: "!bg-background !text-foreground !border-border"
                 });
             }
         } catch (error) {
@@ -150,7 +146,7 @@ export function OtpVerificationForm({ session_Id, maskedEmail, timeToLive }: Otp
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
-            <Card className="max-w-105 w-full p-2 py-7! md:p-4 rounded-xl shadow-sm max-sm:border-0 max-sm:shadow-none max-sm:bg-transparent">
+            <Card className="max-w-105 w-full p-2 py-7! md:p-4 rounded-xl shadow-sm">
                 <CardHeader className="text-center space-y-3">
                     <div className="w-12 h-12 bg-primary/15 text-foreground rounded-full flex items-center justify-center mx-auto">
                         <ShieldCheck className="w-6 h-6" />
@@ -178,7 +174,7 @@ export function OtpVerificationForm({ session_Id, maskedEmail, timeToLive }: Otp
                                     onKeyDown={(e) => handleKeyDown(e, index)}
                                     onPaste={handlePaste}
                                     aria-label={`Digit ${index + 1} of 6`}
-                                    className="w-12 h-14 text-center text-xl font-semibold tabular-nums border-2 border-slate-200 rounded-lg bg-white focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/25 transition-all"
+                                    className="w-12 h-14 text-center text-xl font-semibold tabular-nums border-2 border-muted-foreground/25 rounded-lg bg-white focus-visible:border-brand focus-visible:ring-4 focus-visible:ring-primary/25 transition-all"
                                     required
                                 />
                             ))}
@@ -189,7 +185,9 @@ export function OtpVerificationForm({ session_Id, maskedEmail, timeToLive }: Otp
 
                     <div className="mt-6 text-center text-sm text-muted-foreground">
                         Didn&apos;t receive the code?{' '}
-                        {!isResendActive ? (<span className='text-ink dark:text-white font-semibold'>00:{String(count).padStart(2, '0')}</span>) : (
+                        {!isResendActive ? (
+                            <span className='text-ink dark:text-white font-semibold'>00:{String(count).padStart(2, '0')}</span>
+                        ) : (
                             <button
                                 disabled={isPending}
                                 type="button"

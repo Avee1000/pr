@@ -30,6 +30,12 @@ export function GlobalAlert() {
                 message: 'You must be logged in to view this page.',
                 variant: 'destructive',
             });
+        } else if ( errorType === 'too_many_attempts') {
+            setAlertData({
+                title: 'Max attempts exceeded',
+                message: 'You have reach your maximum attempts',
+                variant: 'destructive',
+            })
         }
     }, [searchParams]);
 
